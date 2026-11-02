@@ -1,0 +1,432 @@
+@model WeatherApp.Models.Weather.WeatherViewModel
+@{
+    ViewData["Title"] = $"{Model.CityName} Weather Forecast";
+}
+
+<div class="container mt-3">
+    <!-- Saved Favorite Cities Quick-Bar -->
+    @if (Model.FavoriteCities.Any())
+    {
+        <div class="d-flex align-items-center gap-2 mb-3 overflow-x-auto pb-2" style="scrollbar-width: none;">
+            <span class="text-secondary small text-nowrap"><i class="bi bi-heart-fill text-danger me-1"></i> Saved:</span>
+            @foreach (var fav in Model.FavoriteCities)
+            {
+                <a asp-controller="Weather" asp-action="Index" asp-route-city="@fav.CityName" asp-route-lat="@fav.Latitude" asp-route-lon="@fav.Longitude"
+                   class="btn btn-sm @(fav.CityName.Equals(Model.CityName, StringComparison.OrdinalIgnoreCase) ? "btn-primary" : "btn-modern-outline") rounded-pill text-nowrap py-1 px-3">
+                    @fav.CityName <small class="opacity-75">(@fav.Country)</small>
+                </a>
+            }
+        </div>
+    }
+
+    <!-- Main Hero Weather Panel -->
+    <div class="glass-panel hero-weather-card @Model.ThemeClass mb-4">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-secondary-subtle text-secondary px-3 py-1 rounded-pill small">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i> @Model.Latitude.ToString("F2")°, @Model.Longitude.ToString("F2")° &bull; @Model.Timezone
+                    </span>
+                    <span class="badge-grade @(Model.ComfortGrade.StartsWith("A") ? "badge-grade-a" : (Model.ComfortGrade.StartsWith("B") ? "badge-grade-b" : "badge-grade-c"))">
+                        @Model.ComfortGrade
+                    </span>
+                </div>
+
+                <h1 class="display-4 fw-extrabold text-white mb-1">
+                    @Model.CityName
+                    @if (!string.IsNullOrEmpty(Model.AdminArea))
+                    {
+                        <span class="fs-4 fw-normal text-secondary">, @Model.AdminArea</span>
+                    }
+                </h1>
+                <p class="text-secondary fs-5 mb-4">@Model.Country &bull; Updated @DateTime.UtcNow.ToString("htt UTC")</p>
+
+                <!-- Big Temperature Display -->
+                <div class="d-flex align-items-baseline gap-3 mb-3">
+                    <div class="hero-temp-large unit-celsius">@Model.CurrentTempC.ToString("F1")°C</div>
+                    <div class="hero-temp-large unit-fahrenheit d-none">@Model.CurrentTempF.ToString("F1")°F</div>
+                    
+                    <div>
+                        <div class="fs-5 text-white fw-semibold">
+                            Feels like 
+                            <span class="unit-celsius">@Model.FeelsLikeC.ToString("F1")°C</span>
+                            <span class="unit-fahrenheit d-none">@Model.FeelsLikeF.ToString("F1")°F</span>
+                        </div>
+                        <div class="text-secondary small">
+                            High: <span class="unit-celsius">@Model.TodayMaxC.ToString("F1")°C</span><span class="unit-fahrenheit d-none">@((Model.TodayMaxC * 9 / 5 + 32).ToString("F1"))°F</span> &bull; 
+                            Low: <span class="unit-celsius">@Model.TodayMinC.ToString("F1")°C</span><span class="unit-fahrenheit d-none">@((Model.TodayMinC * 9 / 5 + 32).ToString("F1"))°F</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <span class="fs-4 fw-bold text-white">@Model.ConditionText</span>
+                    <span class="badge bg-secondary-subtle text-secondary">WMO Code @Model.WeatherCode</span>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="d-flex flex-wrap gap-2">
+                    <!-- Favorite Toggle -->
+                    <form asp-controller="Weather" asp-action="ToggleFavorite" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="cityName" value="@Model.CityName" />
+                        <input type="hidden" name="country" value="@Model.Country" />
+                        <input type="hidden" name="lat" value="@Model.Latitude" />
+                        <input type="hidden" name="lon" value="@Model.Longitude" />
+                        <input type="hidden" name="adminArea" value="@Model.AdminArea" />
+                        
+                        <button type="submit" class="btn @(Model.IsFavorite ? "btn-danger" : "btn-modern-outline") rounded-pill px-3">
+                            <i class="bi @(Model.IsFavorite ? "bi-heart-fill" : "bi-heart") me-1"></i>
+                            @(Model.IsFavorite ? "Saved in Favorites" : "Save Location")
+                        </button>
+                    </form>
+
+                    <!-- Export Options (Files focus from Stage 2) -->
+                    <div class="dropdown d-inline">
+                        <button class="btn btn-modern-outline rounded-pill px-3 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-download me-1"></i> Export Data
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark border-secondary">
+                            <li>
+                                <a class="dropdown-item py-2" asp-controller="Weather" asp-action="Export" asp-route-city="@Model.CityName" asp-route-format="json" asp-route-lat="@Model.Latitude" asp-route-lon="@Model.Longitude">
+                                    <i class="bi bi-filetype-json text-warning me-2"></i> Export as JSON
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" asp-controller="Weather" asp-action="Export" asp-route-city="@Model.CityName" asp-route-format="csv" asp-route-lat="@Model.Latitude" asp-route-lon="@Model.Longitude">
+                                    <i class="bi bi-filetype-csv text-success me-2"></i> Export as CSV
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2" asp-controller="Weather" asp-action="Export" asp-route-city="@Model.CityName" asp-route-format="txt" asp-route-lat="@Model.Latitude" asp-route-lon="@Model.Longitude">
+                                    <i class="bi bi-file-text text-info me-2"></i> Export as Plain Text
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Compare with another city -->
+                    <a asp-controller="Weather" asp-action="Compare" asp-route-city1="@Model.CityName" class="btn btn-modern-outline rounded-pill px-3">
+                        <i class="bi bi-arrow-left-right me-1"></i> Compare City
+                    </a>
+
+                    <!-- Atmospheric Calculator prefilled -->
+                    <a asp-controller="Tools" asp-action="Calculator" asp-route-temp="@Model.CurrentTempC" asp-route-humidity="@Model.Humidity" asp-route-wind="@Model.WindSpeedKmh" class="btn btn-modern-outline rounded-pill px-3">
+                        <i class="bi bi-calculator me-1"></i> Calc Comfort
+                    </a>
+                </div>
+            </div>
+
+            <!-- Big Animated Icon & Comfort Widget -->
+            <div class="col-lg-5 text-center mt-4 mt-lg-0">
+                <div class="weather-badge-icon mb-3">
+                    @Model.ConditionIcon
+                </div>
+                <div class="glass-panel p-3 d-inline-block text-start" style="background: rgba(0, 0, 0, 0.25); min-width: 260px;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="small text-muted fw-bold text-uppercase">Comfort Index</span>
+                        <span class="badge bg-primary">Score: @Model.ComfortScore/100</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px; background: rgba(255,255,255,0.1);">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: @Model.ComfortScore%;" aria-valuenow="@Model.ComfortScore" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <small class="text-secondary d-block">@Model.ComfortSummary</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Atmospheric Metrics 6-Grid -->
+    <div class="row g-3 mb-4">
+        <!-- Humidity -->
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="metric-pill">
+                <div class="icon-box text-info">💧</div>
+                <div>
+                    <div class="metric-label">Humidity</div>
+                    <div class="metric-val">@Model.Humidity.ToString("F0")%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wind Speed -->
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="metric-pill">
+                <div class="icon-box text-primary">💨</div>
+                <div>
+                    <div class="metric-label">Wind</div>
+                    <div class="metric-val">@Model.WindSpeedKmh.ToString("F0") <small class="fs-6 fw-normal">km/h</small></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wind Direction -->
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="metric-pill">
+                <div class="icon-box text-warning">🧭</div>
+                <div>
+                    <div class="metric-label">Direction</div>
+                    <div class="metric-val">@Model.WindDirection</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pressure -->
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="metric-pill">
+                <div class="icon-box text-emerald">⏲️</div>
+                <div>
+                    <div class="metric-label">Pressure</div>
+                    <div class="metric-val">@Model.PressureHpa.ToString("F0") <small class="fs-6 fw-normal">hPa</small></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- UV Index -->
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="metric-pill">
+                <div class="icon-box text-danger">☀️</div>
+                <div>
+                    <div class="metric-label">UV Index</div>
+                    <div class="metric-val">@Model.UvIndex.ToString("F1")</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Precipitation -->
+        <div class="col-6 col-md-4 col-lg-2">
+            <div class="metric-pill">
+                <div class="icon-box text-info">🌧️</div>
+                <div>
+                    <div class="metric-label">Precipitation</div>
+                    <div class="metric-val">@Model.PrecipitationMm.ToString("F1") <small class="fs-6 fw-normal">mm</small></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Solar & Sunlight Times -->
+    @if (!string.IsNullOrEmpty(Model.Sunrise))
+    {
+        <div class="glass-panel p-3 mb-4 d-flex flex-wrap justify-content-around align-items-center">
+            <div class="d-flex align-items-center gap-2">
+                <span style="font-size: 1.5rem;">🌅</span>
+                <div>
+                    <small class="text-muted text-uppercase">Sunrise</small>
+                    <div class="fw-bold text-white">@Model.Sunrise</div>
+                </div>
+            </div>
+            <div class="border-start border-secondary border-opacity-25 d-none d-md-block" style="height: 30px;"></div>
+            <div class="d-flex align-items-center gap-2">
+                <span style="font-size: 1.5rem;">🌇</span>
+                <div>
+                    <small class="text-muted text-uppercase">Sunset</small>
+                    <div class="fw-bold text-white">@Model.Sunset</div>
+                </div>
+            </div>
+            <div class="border-start border-secondary border-opacity-25 d-none d-md-block" style="height: 30px;"></div>
+            <div class="d-flex align-items-center gap-2">
+                <span style="font-size: 1.5rem;">⚡</span>
+                <div>
+                    <small class="text-muted text-uppercase">HVAC Impact</small>
+                    <a asp-controller="Tools" asp-action="EnergyBudget" asp-route-city="@Model.CityName" asp-route-outdoorTemp="@Model.CurrentTempC" class="fw-bold text-info text-decoration-none">
+                        Simulate Heating/AC &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Hourly Trend Chart (Next 24 Hours) -->
+    <div class="glass-panel p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h3 class="h5 fw-bold mb-0 text-white"><i class="bi bi-graph-up text-info me-2"></i>24-Hour Atmospheric Curve</h3>
+                <small class="text-secondary">Hourly temperature evolution & precipitation probability</small>
+            </div>
+            <span class="badge bg-secondary-subtle text-secondary">Hourly Data</span>
+        </div>
+
+        <div style="height: 240px; position: relative;">
+            <canvas id="hourlyWeatherChart"></canvas>
+        </div>
+
+        <!-- Horizontal scrollable timeline chips -->
+        <div class="hourly-timeline mt-3">
+            @foreach (var hour in Model.HourlyForecast)
+            {
+                <div class="hourly-item">
+                    <small class="text-secondary d-block">@hour.TimeLabel</small>
+                    <div class="my-1" style="font-size: 1.3rem;">@hour.Icon</div>
+                    <div class="fw-bold text-white unit-celsius small">@hour.TempC.ToString("F0")°</div>
+                    <div class="fw-bold text-white unit-fahrenheit d-none small">@hour.TempF.ToString("F0")°</div>
+                    @if (hour.RainProbability > 0)
+                    {
+                        <small class="text-info d-block" style="font-size: 0.7rem;"><i class="bi bi-droplet-fill"></i> @hour.RainProbability%</small>
+                    }
+                    else
+                    {
+                        <small class="text-muted d-block" style="font-size: 0.7rem;">0%</small>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- 7-Day Extended Forecast -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-7">
+            <div class="glass-panel p-4 h-100">
+                <h3 class="h5 fw-bold mb-3 text-white"><i class="bi bi-calendar3 text-primary me-2"></i>7-Day Extended Forecast</h3>
+                
+                <div class="daily-list">
+                    @foreach (var day in Model.DailyForecast)
+                    {
+                        <div class="daily-card">
+                            <div style="min-width: 90px;">
+                                <div class="fw-bold text-white">@day.DayName</div>
+                                <small class="text-secondary">@day.DateLabel</small>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="font-size: 1.5rem;">@day.Icon</span>
+                                <span class="small text-secondary d-none d-sm-inline">@day.Description</span>
+                            </div>
+
+                            <div class="text-end" style="min-width: 130px;">
+                                <span class="fw-bold text-white unit-celsius">@day.MaxTempC.ToString("F0")°</span>
+                                <span class="fw-bold text-white unit-fahrenheit d-none">@((day.MaxTempC * 9 / 5 + 32).ToString("F0"))°</span>
+                                <span class="text-muted mx-1">/</span>
+                                <span class="text-secondary unit-celsius">@day.MinTempC.ToString("F0")°</span>
+                                <span class="text-secondary unit-fahrenheit d-none">@((day.MinTempC * 9 / 5 + 32).ToString("F0"))°</span>
+                                
+                                @if (day.RainSumMm > 0)
+                                {
+                                    <small class="text-info ms-2"><i class="bi bi-umbrella"></i> @day.RainSumMm.ToString("F1")mm</small>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Health, Attire & Outdoor Lifestyle Advices (Stage 1 conditional logic) -->
+        <div class="col-lg-5">
+            <div class="glass-panel p-4 h-100">
+                <h3 class="h5 fw-bold mb-3 text-white"><i class="bi bi-lightbulb text-warning me-2"></i>Atmospheric Insights & Tips</h3>
+                <p class="text-secondary small mb-3">Computed via conditional analysis over current conditions</p>
+
+                <div class="d-flex flex-column gap-2">
+                    @foreach (var tip in Model.Advices)
+                    {
+                        <div class="p-3 rounded-3" style="background: rgba(255, 255, 255, 0.03); border-left: 3px solid @(tip.Severity == "alert" ? "#f43f5e" : (tip.Severity == "warning" ? "#f59e0b" : (tip.Severity == "success" ? "#10b981" : "#38bdf8")));">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span>@tip.Icon</span>
+                                <strong class="text-white small">@tip.Title</strong>
+                            </div>
+                            <small class="text-secondary">@tip.Description</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connected Curriculum Modules Section -->
+    <div class="glass-panel p-4 mb-4">
+        <h3 class="h5 fw-bold mb-3 text-white"><i class="bi bi-intersect text-info me-2"></i>Connected Ecosystem Features for @Model.CityName</h3>
+        
+        <div class="row g-3">
+            <!-- Related Tasks (Project 4: To-Do List) -->
+            <div class="col-md-4">
+                <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass-subtle);">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="text-white"><i class="bi bi-check2-circle text-success me-1"></i> Weather To-Dos</strong>
+                        <a asp-controller="Planner" asp-action="Todo" asp-route-city="@Model.CityName" class="small text-info text-decoration-none">Open Planner &rarr;</a>
+                    </div>
+                    @if (Model.MatchingTodoItems.Any())
+                    {
+                        <ul class="list-unstyled small mb-0">
+                            @foreach (var task in Model.MatchingTodoItems.Take(3))
+                            {
+                                <li class="py-1 text-secondary @(task.IsCompleted ? "text-decoration-line-through opacity-50" : "")">
+                                    <i class="bi @(task.IsCompleted ? "bi-check-circle-fill text-success" : "bi-circle") me-1"></i>
+                                    @task.TaskDescription
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <small class="text-muted">No custom tasks registered for @Model.CityName yet.</small>
+                    }
+                </div>
+            </div>
+
+            <!-- Related Notes (Project 9: Personal Notes) -->
+            <div class="col-md-4">
+                <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass-subtle);">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="text-white"><i class="bi bi-journal-text text-info me-1"></i> Weather Notes</strong>
+                        <a asp-controller="Notes" asp-action="Create" asp-route-city="@Model.CityName" class="small text-info text-decoration-none">+ New Note</a>
+                    </div>
+                    @if (Model.RelatedNotes.Any())
+                    {
+                        <ul class="list-unstyled small mb-0">
+                            @foreach (var note in Model.RelatedNotes.Take(3))
+                            {
+                                <li class="py-1 text-secondary">
+                                    <span class="badge bg-secondary-subtle text-secondary me-1" style="font-size: 0.65rem;">@note.Category</span>
+                                    <a asp-controller="Notes" asp-action="Index" asp-route-city="@Model.CityName" class="text-white text-decoration-none">@note.Title</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <small class="text-muted">No journal observations for @Model.CityName yet.</small>
+                    }
+                </div>
+            </div>
+
+            <!-- Emergency Dispatch (Project 11: Contact Book API) -->
+            <div class="col-md-4">
+                <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass-subtle);">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong class="text-white"><i class="bi bi-telephone-plus text-danger me-1"></i> Emergency Hotline</strong>
+                        <a asp-controller="Contacts" asp-action="Index" asp-route-city="@Model.CityName" class="small text-danger text-decoration-none">Directory &rarr;</a>
+                    </div>
+                    @if (Model.LocalContacts.Any())
+                    {
+                        <ul class="list-unstyled small mb-0">
+                            @foreach (var c in Model.LocalContacts.Take(2))
+                            {
+                                <li class="py-1">
+                                    <span class="text-white fw-semibold">@c.Name</span>: 
+                                    <a href="tel:@c.Phone" class="text-info text-decoration-none fw-bold">@c.Phone</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <small class="text-muted">Emergency services available in global directory.</small>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HourlyForecast.Select(h => h.TimeLabel)));
+            const temps = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HourlyForecast.Select(h => h.TempC)));
+            const rainProbs = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HourlyForecast.Select(h => h.RainProbability)));
+            
+            renderHourlyChart('hourlyWeatherChart', labels, temps, rainProbs);
+        });
+    </script>
+}

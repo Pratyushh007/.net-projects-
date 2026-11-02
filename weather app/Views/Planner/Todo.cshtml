@@ -1,0 +1,207 @@
+@model List<WeatherApp.Models.Entities.WeatherTodoItem>
+@{
+    ViewData["Title"] = "Weather-Smart To-Do Planner (Project 4)";
+    var currentWeather = ViewBag.CurrentWeather as WeatherApp.Models.Weather.WeatherViewModel;
+    var currentCity = ViewBag.CurrentCity as string ?? "London";
+    var filter = ViewBag.Filter as string ?? "all";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary">Project 4 &bull; Stage 2</span>
+                <span class="badge bg-primary-subtle text-primary">Focus: Classes, Collections, LINQ, Files</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-check2-square text-success me-2"></i>Weather-Smart Activity & Task Planner</h1>
+        </div>
+        <a asp-controller="Weather" asp-action="Index" asp-route-city="@currentCity" class="btn btn-modern-outline btn-sm">
+            &larr; Weather for @currentCity
+        </a>
+    </div>
+
+    <!-- Live Weather Bar for Task Compatibility -->
+    @if (currentWeather != null)
+    {
+        <div class="glass-panel p-3 mb-4 d-flex flex-wrap justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <span style="font-size: 2rem;">@currentWeather.ConditionIcon</span>
+                <div>
+                    <strong class="text-white">Active Weather in @currentWeather.CityName:</strong>
+                    <span class="text-info fw-bold ms-1">@currentWeather.CurrentTempC.ToString("F1")°C</span>, @currentWeather.ConditionText
+                </div>
+            </div>
+            <div class="d-flex gap-2 text-secondary small">
+                <span>Rain: <strong class="text-white">@currentWeather.PrecipitationMm.ToString("F1") mm</strong></span> &bull;
+                <span>Wind: <strong class="text-white">@currentWeather.WindSpeedKmh.ToString("F0") km/h</strong></span> &bull;
+                <span>UV: <strong class="text-white">@currentWeather.UvIndex.ToString("F1")</strong></span>
+            </div>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- New Task Form -->
+        <div class="col-lg-4">
+            <div class="glass-panel p-4">
+                <h2 class="h5 fw-bold text-white mb-3">Add Weather-Conditioned Task</h2>
+
+                <form asp-controller="Planner" asp-action="AddTodo" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Task Description</label>
+                        <input type="text" name="taskDescription" placeholder="e.g. Lawn mowing or Evening coastal run" class="form-control form-glass" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">City Location (Optional)</label>
+                        <input type="text" name="targetCity" value="@currentCity" class="form-control form-glass" placeholder="Leave blank for any city">
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">Required Condition</label>
+                            <select name="requiredWeatherType" class="form-select form-glass">
+                                <option value="Any">Any Condition</option>
+                                <option value="Clear">Clear / Sunny</option>
+                                <option value="Mild">Mild Temperature</option>
+                                <option value="Rain">Rainy (Indoor task)</option>
+                                <option value="Snow">Snowy</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">Priority</label>
+                            <select name="priority" class="form-select form-glass">
+                                <option value="Normal">Normal</option>
+                                <option value="High">High</option>
+                                <option value="Low">Low</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">Min Temp (°C)</label>
+                            <input type="number" step="1" name="minTemp" placeholder="e.g. 15" class="form-control form-glass">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">Max Temp (°C)</label>
+                            <input type="number" step="1" name="maxTemp" placeholder="e.g. 26" class="form-control form-glass">
+                        </div>
+                    </div>
+
+                    <div class="form-check form-switch mb-4">
+                        <input class="form-check-input" type="checkbox" name="requiresNoRain" value="true" id="dryCheck" checked>
+                        <label class="form-check-label text-secondary small" for="dryCheck">Must be dry (No rain)</label>
+                    </div>
+
+                    <button type="submit" class="btn btn-modern-primary w-100 py-2">
+                        <i class="bi bi-plus-lg me-1"></i> Add Task to Planner
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Task List with LINQ Filters -->
+        <div class="col-lg-8">
+            <div class="glass-panel p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                    <h2 class="h5 fw-bold text-white mb-0">Your Tasks (@Model.Count)</h2>
+
+                    <!-- Filter Tabs -->
+                    <div class="btn-group btn-group-sm">
+                        <a asp-controller="Planner" asp-action="Todo" asp-route-city="@currentCity" asp-route-filter="all" class="btn @(filter == "all" ? "btn-primary" : "btn-modern-outline")">All</a>
+                        <a asp-controller="Planner" asp-action="Todo" asp-route-city="@currentCity" asp-route-filter="active" class="btn @(filter == "active" ? "btn-primary" : "btn-modern-outline")">Active</a>
+                        <a asp-controller="Planner" asp-action="Todo" asp-route-city="@currentCity" asp-route-filter="completed" class="btn @(filter == "completed" ? "btn-primary" : "btn-modern-outline")">Done</a>
+                    </div>
+                </div>
+
+                @if (!Model.Any())
+                {
+                    <div class="p-5 text-center text-muted">
+                        <i class="bi bi-calendar-x fs-1 mb-2 d-block"></i>
+                        No tasks match the current filter. Add one above!
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-column gap-2">
+                        @foreach (var item in Model)
+                        {
+                            // Weather Evaluation Logic: Check if current condition suits the task!
+                            bool tempOk = true;
+                            if (currentWeather != null)
+                            {
+                                if (item.MinTemp.HasValue && currentWeather.CurrentTempC < item.MinTemp.Value) tempOk = false;
+                                if (item.MaxTemp.HasValue && currentWeather.CurrentTempC > item.MaxTemp.Value) tempOk = false;
+                            }
+                            bool rainOk = true;
+                            if (currentWeather != null && item.RequiresNoRain && currentWeather.PrecipitationMm > 0)
+                            {
+                                rainOk = false;
+                            }
+                            bool weatherSuitable = tempOk && rainOk;
+
+                            <div class="p-3 rounded-3 d-flex align-items-center justify-content-between transition" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass-subtle);">
+                                <div class="d-flex align-items-center gap-3">
+                                    <form asp-controller="Planner" asp-action="ToggleTodo" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <input type="hidden" name="city" value="@currentCity" />
+                                        <button type="submit" class="btn btn-link p-0 text-decoration-none">
+                                            <i class="bi @(item.IsCompleted ? "bi-check-circle-fill text-success fs-4" : "bi-circle text-secondary fs-4")"></i>
+                                        </button>
+                                    </form>
+
+                                    <div>
+                                        <div class="fw-semibold @(item.IsCompleted ? "text-decoration-line-through text-muted" : "text-white")">
+                                            @item.TaskDescription
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-2 align-items-center mt-1">
+                                            @if (!string.IsNullOrEmpty(item.TargetCity))
+                                            {
+                                                <span class="badge bg-secondary-subtle text-secondary small"><i class="bi bi-geo-alt"></i> @item.TargetCity</span>
+                                            }
+                                            @if (item.RequiresNoRain)
+                                            {
+                                                <span class="badge bg-info-subtle text-info small"><i class="bi bi-umbrella"></i> Dry Weather</span>
+                                            }
+                                            @if (item.MinTemp.HasValue || item.MaxTemp.HasValue)
+                                            {
+                                                <span class="badge bg-secondary-subtle text-secondary small">
+                                                    Temp: @(item.MinTemp?.ToString("F0") ?? "*")°C to @(item.MaxTemp?.ToString("F0") ?? "*")°C
+                                                </span>
+                                            }
+                                            
+                                            <!-- Weather Compatibility Status Indicator -->
+                                            @if (!item.IsCompleted && currentWeather != null)
+                                            {
+                                                if (weatherSuitable)
+                                                {
+                                                    <span class="badge bg-success-subtle text-success small"><i class="bi bi-check-lg"></i> Ideal Weather Today!</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning-subtle text-warning small"><i class="bi bi-exclamation-triangle"></i> Weather Unfavorable</span>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <form asp-controller="Planner" asp-action="DeleteTodo" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@item.Id" />
+                                    <input type="hidden" name="city" value="@currentCity" />
+                                    <button type="submit" class="btn btn-link text-danger p-0" title="Delete Task">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

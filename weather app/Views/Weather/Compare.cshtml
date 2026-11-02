@@ -1,0 +1,153 @@
+@{
+    ViewData["Title"] = "Compare City Climates";
+    var w1 = ViewBag.Weather1 as WeatherApp.Models.Weather.WeatherViewModel;
+    var w2 = ViewBag.Weather2 as WeatherApp.Models.Weather.WeatherViewModel;
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 fw-bold text-white mb-1"><i class="bi bi-arrow-left-right text-info me-2"></i>Atmospheric City Comparison</h1>
+            <p class="text-secondary small mb-0">Evaluate climate differentials and comfort metrics between two locations</p>
+        </div>
+        <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-outline btn-sm">
+            &larr; Back to Single City
+        </a>
+    </div>
+
+    <!-- City Pickers Form -->
+    <div class="glass-panel p-3 mb-4">
+        <form method="get" asp-controller="Weather" asp-action="Compare" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary">City 1</span>
+                    <input type="text" name="city1" value="@(w1?.CityName ?? "London")" class="form-control form-glass" placeholder="e.g. London" required>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary">City 2</span>
+                    <input type="text" name="city2" value="@(w2?.CityName ?? "Tokyo")" class="form-control form-glass" placeholder="e.g. Tokyo" required>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-modern-primary w-100">
+                    <i class="bi bi-arrow-repeat me-1"></i> Compare
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @if (w1 != null && w2 != null)
+    {
+        <div class="row g-4 mb-4">
+            <!-- City 1 Column -->
+            <div class="col-md-6">
+                <div class="glass-panel p-4 h-100 @w1.ThemeClass">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-secondary-subtle text-secondary mb-1">City 1</span>
+                            <h2 class="h3 text-white fw-bold mb-0">@w1.CityName</h2>
+                            <small class="text-secondary">@w1.Country</small>
+                        </div>
+                        <span class="badge-grade badge-grade-a">@w1.ComfortGrade</span>
+                    </div>
+
+                    <div class="d-flex align-items-baseline gap-2 mb-3">
+                        <div class="display-4 fw-bold text-white unit-celsius">@w1.CurrentTempC.ToString("F1")°C</div>
+                        <div class="display-4 fw-bold text-white unit-fahrenheit d-none">@w1.CurrentTempF.ToString("F1")°F</div>
+                        <div class="text-secondary small">Feels like @w1.FeelsLikeC.ToString("F1")°C</div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <span style="font-size: 2rem;">@w1.ConditionIcon</span>
+                        <span class="fs-5 text-white fw-semibold">@w1.ConditionText</span>
+                    </div>
+
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>Humidity</span>
+                            <strong class="text-white">@w1.Humidity.ToString("F0")%</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>Wind Speed</span>
+                            <strong class="text-white">@w1.WindSpeedKmh.ToString("F0") km/h (@w1.WindDirection)</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>Barometric Pressure</span>
+                            <strong class="text-white">@w1.PressureHpa.ToString("F0") hPa</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>Precipitation</span>
+                            <strong class="text-white">@w1.PrecipitationMm.ToString("F1") mm</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>UV Index</span>
+                            <strong class="text-white">@w1.UvIndex.ToString("F1")</strong>
+                        </li>
+                    </ul>
+
+                    <div class="mt-4">
+                        <a asp-controller="Weather" asp-action="Index" asp-route-city="@w1.CityName" class="btn btn-modern-outline btn-sm w-100">
+                            Explore Full Station for @w1.CityName &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- City 2 Column -->
+            <div class="col-md-6">
+                <div class="glass-panel p-4 h-100 @w2.ThemeClass">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <span class="badge bg-secondary-subtle text-secondary mb-1">City 2</span>
+                            <h2 class="h3 text-white fw-bold mb-0">@w2.CityName</h2>
+                            <small class="text-secondary">@w2.Country</small>
+                        </div>
+                        <span class="badge-grade badge-grade-a">@w2.ComfortGrade</span>
+                    </div>
+
+                    <div class="d-flex align-items-baseline gap-2 mb-3">
+                        <div class="display-4 fw-bold text-white unit-celsius">@w2.CurrentTempC.ToString("F1")°C</div>
+                        <div class="display-4 fw-bold text-white unit-fahrenheit d-none">@w2.CurrentTempF.ToString("F1")°F</div>
+                        <div class="text-secondary small">Feels like @w2.FeelsLikeC.ToString("F1")°C</div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 mb-4">
+                        <span style="font-size: 2rem;">@w2.ConditionIcon</span>
+                        <span class="fs-5 text-white fw-semibold">@w2.ConditionText</span>
+                    </div>
+
+                    <ul class="list-group list-group-flush bg-transparent">
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>Humidity</span>
+                            <strong class="text-white">@w2.Humidity.ToString("F0")%</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>Wind Speed</span>
+                            <strong class="text-white">@w2.WindSpeedKmh.ToString("F0") km/h (@w2.WindDirection)</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>Barometric Pressure</span>
+                            <strong class="text-white">@w2.PressureHpa.ToString("F0") hPa</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>Precipitation</span>
+                            <strong class="text-white">@w2.PrecipitationMm.ToString("F1") mm</strong>
+                        </li>
+                        <li class="list-group-item bg-transparent text-secondary border-secondary d-flex justify-content-between px-0">
+                            <span>UV Index</span>
+                            <strong class="text-white">@w2.UvIndex.ToString("F1")</strong>
+                        </li>
+                    </ul>
+
+                    <div class="mt-4">
+                        <a asp-controller="Weather" asp-action="Index" asp-route-city="@w2.CityName" class="btn btn-modern-outline btn-sm w-100">
+                            Explore Full Station for @w2.CityName &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

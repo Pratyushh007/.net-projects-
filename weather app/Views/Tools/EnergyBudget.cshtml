@@ -1,0 +1,174 @@
+@model WeatherApp.Models.Tools.EnergyBankViewModel
+@{
+    ViewData["Title"] = "Smart Climate Wallet & Energy Budget (Project 7)";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary">Project 7 &bull; Stage 2</span>
+                <span class="badge bg-primary-subtle text-primary">Focus: Classes, Collections, LINQ, Files</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-wallet2 text-emerald me-2" style="color: #10b981;"></i>Smart Climate Wallet & Energy Budget Simulator</h1>
+        </div>
+        <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-outline btn-sm">
+            &larr; Weather Station
+        </a>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Account Balance Card -->
+        <div class="col-lg-4">
+            <div class="glass-panel p-4 h-100" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(15, 23, 42, 0.4)); border-color: rgba(16, 185, 129, 0.3);">
+                <small class="text-secondary text-uppercase fw-bold">@Model.Account.AccountName</small>
+                <div class="display-5 fw-extrabold text-white my-2">@Model.Account.CurrentBalance.ToString("C")</div>
+                
+                <div class="d-flex justify-content-between text-secondary small py-2 border-top border-secondary border-opacity-25 mt-3">
+                    <span>Monthly Reserve:</span>
+                    <strong class="text-white">@Model.Account.MonthlyBudget.ToString("C")</strong>
+                </div>
+                <div class="d-flex justify-content-between text-secondary small py-2 border-top border-secondary border-opacity-25">
+                    <span>Remaining Reserve:</span>
+                    <strong class="@(Model.MonthlyBudgetRemaining >= 0 ? "text-success" : "text-danger")">@Model.MonthlyBudgetRemaining.ToString("C")</strong>
+                </div>
+                <div class="d-flex justify-content-between text-secondary small py-2 border-top border-secondary border-opacity-25">
+                    <span>Thermostat Target:</span>
+                    <strong class="text-info">@Model.Account.TargetIndoorTempC.ToString("F1")°C</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-Time Atmospheric Cost Projection -->
+        <div class="col-lg-4">
+            <div class="glass-panel p-4 h-100">
+                <small class="text-secondary text-uppercase fw-bold">Live Climate HVAC Impact</small>
+                <div class="d-flex align-items-baseline gap-2 my-2">
+                    <span class="display-5 fw-extrabold text-info">@Model.EstimatedDailyCost.ToString("C")</span>
+                    <span class="text-secondary small">/ day</span>
+                </div>
+
+                <p class="text-secondary small">
+                    Outdoor temperature in <strong>@Model.CurrentCity</strong> is <strong>@Model.OutdoorTempC.ToString("F1")°C</strong> versus target <strong>@Model.Account.TargetIndoorTempC.ToString("F1")°C</strong>.
+                </p>
+
+                <div class="p-3 rounded-2" style="background: rgba(255, 255, 255, 0.03);">
+                    <small class="text-muted d-block">Projected 30-Day Cost</small>
+                    <span class="fs-5 fw-bold text-white">@Model.ProjectedMonthlyBill.ToString("C")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thermostat Settings -->
+        <div class="col-lg-4">
+            <div class="glass-panel p-4 h-100">
+                <h2 class="h6 fw-bold text-white mb-3"><i class="bi bi-thermometer-half text-danger me-1"></i> Adjust Thermostat & Rate</h2>
+
+                <form asp-controller="Tools" asp-action="UpdateEnergyTarget" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="accountId" value="@Model.Account.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Target Indoor Temp (°C)</label>
+                        <input type="number" step="0.5" name="targetTemp" value="@Model.Account.TargetIndoorTempC" class="form-control form-glass" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Electricity Tariff ($ / kWh)</label>
+                        <input type="number" step="0.01" name="costPerKwh" value="@Model.Account.CostPerKwh" class="form-control form-glass" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-modern-primary w-100 btn-sm py-2">
+                        Update Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Transaction Injection & Savings Tips -->
+    <div class="row g-4 mb-4">
+        <!-- New Transaction Form -->
+        <div class="col-lg-5">
+            <div class="glass-panel p-4">
+                <h3 class="h6 fw-bold text-white mb-3"><i class="bi bi-plus-circle text-info me-1"></i> Record Energy Expense or Solar Credit</h3>
+
+                <form asp-controller="Tools" asp-action="AddEnergyTransaction" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="accountId" value="@Model.Account.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Description</label>
+                        <input type="text" name="description" placeholder="e.g. Smart AC Cooling Cycle or Solar Grid Feedback" class="form-control form-glass" required>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">Amount ($)</label>
+                            <input type="number" step="0.01" min="0.01" name="amount" class="form-control form-glass" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">Type</label>
+                            <select name="isDeposit" class="form-select form-glass">
+                                <option value="false">Expense / Bill</option>
+                                <option value="true">Deposit / Solar Rebate</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Weather Factor Reason</label>
+                        <input type="text" name="reason" placeholder="e.g. Heatwave peak or sunny rooftop surplus" class="form-control form-glass">
+                    </div>
+
+                    <button type="submit" class="btn btn-modern-primary w-100 py-2">
+                        Log Transaction
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Climate Tips & Transaction History -->
+        <div class="col-lg-7">
+            <div class="glass-panel p-4 mb-4">
+                <h3 class="h6 fw-bold text-white mb-3"><i class="bi bi-lightbulb text-warning me-1"></i> Active Meteorological Energy Conservation Tips</h3>
+                <ul class="list-unstyled mb-4">
+                    @foreach (var tip in Model.EnergySavingTips)
+                    {
+                        <li class="py-2 border-bottom border-secondary border-opacity-25 small text-secondary d-flex align-items-start gap-2">
+                            <i class="bi bi-check2 text-success mt-1"></i>
+                            <span>@tip</span>
+                        </li>
+                    }
+                </ul>
+
+                <h3 class="h6 fw-bold text-white mb-3"><i class="bi bi-clock-history text-secondary me-1"></i> Recent Wallet Transactions</h3>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover table-sm align-middle mb-0" style="background: transparent;">
+                        <thead>
+                            <tr class="border-secondary text-secondary small">
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Weather Factor</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="border-secondary">
+                            @foreach (var tx in Model.Account.Transactions.Take(5))
+                            {
+                                <tr>
+                                    <td class="small text-muted">@tx.Date.ToString("MMM dd")</td>
+                                    <td class="small text-white">@tx.Description</td>
+                                    <td class="small text-secondary">@tx.WeatherImpactReason</td>
+                                    <td class="text-end fw-bold @(tx.IsDeposit ? "text-success" : "text-danger")">
+                                        @(tx.IsDeposit ? "+" : "-")@tx.Amount.ToString("C")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

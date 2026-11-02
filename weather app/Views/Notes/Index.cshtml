@@ -1,0 +1,118 @@
+@model List<WeatherApp.Models.Entities.WeatherNote>
+@{
+    ViewData["Title"] = "Personal Weather Journal & Notes (Project 9)";
+    var selectedCategory = ViewBag.SelectedCategory as string ?? "All";
+    var selectedCity = ViewBag.SelectedCity as string;
+    var searchTerm = ViewBag.SearchTerm as string;
+}
+
+<div class="container mt-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-success">Project 9 &bull; Stage 3</span>
+                <span class="badge bg-success-subtle text-success">Focus: ASP.NET Core, EF Core, HTTP</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-journal-richtext text-info me-2"></i>Personal Weather Notes & Field Journal</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-controller="Notes" asp-action="Create" asp-route-city="@selectedCity" class="btn btn-modern-primary btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> New Weather Note
+            </a>
+            <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-outline btn-sm">
+                &larr; Weather Station
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter and Search Bar -->
+    <div class="glass-panel p-3 mb-4">
+        <form method="get" asp-controller="Notes" asp-action="Index" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text bg-dark border-secondary text-secondary"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" value="@searchTerm" class="form-control form-glass" placeholder="Search note title or content...">
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <select name="category" class="form-select form-glass" onchange="this.form.submit()">
+                    <option value="All" selected="@(selectedCategory == "All")">All Categories</option>
+                    <option value="Daily" selected="@(selectedCategory == "Daily")">Daily Weather</option>
+                    <option value="Travel" selected="@(selectedCategory == "Travel")">Travel & Packing</option>
+                    <option value="Photography" selected="@(selectedCategory == "Photography")">Golden Hour / Photography</option>
+                    <option value="Severe Weather" selected="@(selectedCategory == "Severe Weather")">Severe Storms / Prep</option>
+                    <option value="Agriculture" selected="@(selectedCategory == "Agriculture")">Gardening & Farming</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <input type="text" name="city" value="@selectedCity" class="form-control form-glass" placeholder="Filter by City">
+            </div>
+
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-modern-primary w-100 btn-sm">Filter</button>
+                <a asp-controller="Notes" asp-action="Index" class="btn btn-modern-outline btn-sm" title="Clear Filters"><i class="bi bi-x-lg"></i></a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Notes Grid -->
+    @if (!Model.Any())
+    {
+        <div class="glass-panel p-5 text-center text-muted">
+            <i class="bi bi-journal-x fs-1 mb-2 d-block"></i>
+            <h5>No Weather Notes Found</h5>
+            <p class="small text-secondary mb-3">Record your atmospheric observations, travel packing notes, or storm log.</p>
+            <a asp-controller="Notes" asp-action="Create" class="btn btn-modern-primary btn-sm">Create First Note</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var note in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-panel p-4 h-100 d-flex flex-direction-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-secondary-subtle text-secondary small">@note.Category</span>
+                                <small class="text-muted">@note.CreatedAt.ToString("MMM dd, yyyy")</small>
+                            </div>
+
+                            <h2 class="h5 fw-bold text-white mb-2">@note.Title</h2>
+                            <p class="text-secondary small mb-3" style="white-space: pre-line;">@note.Content</p>
+                        </div>
+
+                        <div>
+                            @if (!string.IsNullOrEmpty(note.CityName) || note.TemperatureC.HasValue)
+                            {
+                                <div class="p-2 px-3 rounded-2 mb-3 d-flex justify-content-between align-items-center" style="background: rgba(255, 255, 255, 0.03);">
+                                    <small class="text-white"><i class="bi bi-geo-alt text-danger me-1"></i> @note.CityName</small>
+                                    @if (note.TemperatureC.HasValue)
+                                    {
+                                        <small class="text-info fw-bold">@note.TemperatureC.Value.ToString("F1")°C &bull; @note.Condition</small>
+                                    }
+                                </div>
+                            }
+
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25">
+                                <a asp-controller="Notes" asp-action="Edit" asp-route-id="@note.Id" class="text-info small text-decoration-none">
+                                    <i class="bi bi-pencil me-1"></i> Edit
+                                </a>
+
+                                <form asp-controller="Notes" asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Delete this note?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@note.Id" />
+                                    <button type="submit" class="btn btn-link text-danger p-0 small text-decoration-none">
+                                        <i class="bi bi-trash me-1"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,0 +1,166 @@
+@model List<WeatherApp.Models.Entities.EmergencyContact>
+@{
+    ViewData["Title"] = "Severe Weather Emergency Contacts & API (Project 11)";
+    var selectedCity = ViewBag.SelectedCity as string;
+    var selectedCategory = ViewBag.SelectedCategory as string ?? "All";
+}
+
+<div class="container mt-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4 gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-success">Project 11 &bull; Stage 3</span>
+                <span class="badge bg-success-subtle text-success">Focus: ASP.NET Core, EF Core, HTTP</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-telephone-plus text-danger me-2"></i>Severe Weather Emergency Directory & REST API</h1>
+        </div>
+        <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-outline btn-sm">
+            &larr; Weather Station
+        </a>
+    </div>
+
+    <!-- REST API Documentation Banner -->
+    <div class="glass-panel p-4 mb-4 border-start border-4 border-danger" style="background: linear-gradient(135deg, rgba(244, 63, 94, 0.08), rgba(15, 23, 42, 0.6));">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+                <span class="badge bg-danger me-2">RESTful Web API</span>
+                <span class="text-white fw-bold">Live Endpoint: <code>/api/contactsapi</code></span>
+            </div>
+            <a href="/api/contactsapi" target="_blank" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-box-arrow-up-right me-1"></i> View Raw JSON Feed
+            </a>
+        </div>
+        <p class="text-secondary small mb-2">
+            This Contact Book API controller exposes standardized HTTP CRUD verbs (<code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>DELETE</code>) with Entity Framework Core persistence for civil defense, emergency shelters, and meteorology responders.
+        </p>
+        <div class="d-flex flex-wrap gap-2 font-monospace small">
+            <span class="badge bg-dark text-info border border-secondary">GET /api/contactsapi</span>
+            <span class="badge bg-dark text-info border border-secondary">GET /api/contactsapi?city=London</span>
+            <span class="badge bg-dark text-success border border-secondary">POST /api/contactsapi</span>
+            <span class="badge bg-dark text-warning border border-secondary">PUT /api/contactsapi/{id}</span>
+            <span class="badge bg-dark text-danger border border-secondary">DELETE /api/contactsapi/{id}</span>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- New Contact Form -->
+        <div class="col-lg-4">
+            <div class="glass-panel p-4">
+                <h2 class="h5 fw-bold text-white mb-3">Add Emergency Contact</h2>
+
+                <form asp-controller="Contacts" asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Contact / Agency Name</label>
+                        <input type="text" name="Name" class="form-control form-glass text-white" placeholder="e.g. Flood Operations Desk" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Organization</label>
+                        <input type="text" name="Organization" class="form-control form-glass text-white" placeholder="e.g. National Disaster Relief">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Emergency Phone</label>
+                        <input type="tel" name="Phone" class="form-control form-glass text-white" placeholder="+1-800-555-0199" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">City / Jurisdiction</label>
+                        <input type="text" name="CityOrRegion" value="@(string.IsNullOrEmpty(selectedCity) ? "Global" : selectedCity)" class="form-control form-glass text-white" required>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">Category</label>
+                            <select name="Category" class="form-select form-glass">
+                                <option value="Emergency Services">Emergency Ops</option>
+                                <option value="Storm Shelter">Storm Shelter</option>
+                                <option value="Medical">Medical / Cooling</option>
+                                <option value="Coast Guard">Coast Guard</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">Priority</label>
+                            <select name="PriorityLevel" class="form-select form-glass">
+                                <option value="1">Priority 1 (Critical)</option>
+                                <option value="2">Priority 2 (Warning)</option>
+                                <option value="3">Priority 3 (Advisory)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Notes</label>
+                        <textarea name="Notes" rows="2" class="form-control form-glass text-white" placeholder="Operating hours or coverage radius..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-modern-primary w-100 py-2">
+                        <i class="bi bi-save me-1"></i> Register to Directory
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Directory Contacts List -->
+        <div class="col-lg-8">
+            <div class="glass-panel p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                    <h2 class="h5 fw-bold text-white mb-0">Directory Entries (@Model.Count)</h2>
+
+                    <form method="get" asp-controller="Contacts" asp-action="Index" class="d-flex gap-2">
+                        <select name="category" class="form-select form-select-sm form-glass" onchange="this.form.submit()">
+                            <option value="All" selected="@(selectedCategory == "All")">All Categories</option>
+                            <option value="Emergency Services" selected="@(selectedCategory == "Emergency Services")">Emergency Services</option>
+                            <option value="Storm Shelter" selected="@(selectedCategory == "Storm Shelter")">Storm Shelter</option>
+                            <option value="Medical" selected="@(selectedCategory == "Medical")">Medical Relief</option>
+                        </select>
+                        <input type="text" name="city" value="@selectedCity" class="form-control form-control-sm form-glass" placeholder="City Filter" style="width: 140px;">
+                        <button type="submit" class="btn btn-sm btn-modern-outline">Filter</button>
+                    </form>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    @foreach (var contact in Model)
+                    {
+                        <div class="p-3 rounded-3 d-flex flex-wrap justify-content-between align-items-center gap-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass-subtle);">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <h3 class="h6 fw-bold text-white mb-0">@contact.Name</h3>
+                                    <span class="badge @(contact.PriorityLevel == 1 ? "bg-danger" : (contact.PriorityLevel == 2 ? "bg-warning text-dark" : "bg-secondary"))" style="font-size: 0.65rem;">
+                                        P@(contact.PriorityLevel)
+                                    </span>
+                                    <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.65rem;">@contact.Category</span>
+                                </div>
+
+                                <div class="text-secondary small mb-1">
+                                    @contact.Organization &bull; Region: <strong class="text-white">@contact.CityOrRegion</strong>
+                                </div>
+
+                                @if (!string.IsNullOrEmpty(contact.Notes))
+                                {
+                                    <small class="text-muted d-block font-italic">@contact.Notes</small>
+                                }
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3">
+                                <a href="tel:@contact.Phone" class="btn btn-outline-danger btn-sm px-3 rounded-pill">
+                                    <i class="bi bi-telephone-fill me-1"></i> @contact.Phone
+                                </a>
+
+                                <form asp-controller="Contacts" asp-action="Delete" method="post" class="d-inline" onsubmit="return confirm('Remove contact?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@contact.Id" />
+                                    <button type="submit" class="btn btn-link text-secondary p-0" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

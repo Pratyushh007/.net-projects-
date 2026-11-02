@@ -1,0 +1,157 @@
+@model WeatherApp.Models.Tools.UnitConverterModel
+@{
+    ViewData["Title"] = "Atmospheric Unit Converter (Project 3)";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-secondary">Project 3 &bull; Stage 1</span>
+                <span class="badge bg-info-subtle text-info">Focus: Syntax, Loops, Conditions, Methods</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-arrow-left-right text-primary me-2"></i>Atmospheric Unit Converter</h1>
+        </div>
+        <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-outline btn-sm">
+            &larr; Weather Station
+        </a>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="d-flex gap-2 mb-4 overflow-x-auto pb-2">
+        <a asp-controller="Tools" asp-action="Converter" asp-route-category="Temperature" asp-route-from="Celsius" asp-route-to="Fahrenheit"
+           class="btn @(Model.Category == "Temperature" ? "btn-modern-primary" : "btn-modern-outline") rounded-pill px-4">
+            🌡️ Temperature
+        </a>
+        <a asp-controller="Tools" asp-action="Converter" asp-route-category="WindSpeed" asp-route-from="km/h" asp-route-to="mph"
+           class="btn @(Model.Category == "WindSpeed" ? "btn-modern-primary" : "btn-modern-outline") rounded-pill px-4">
+            💨 Wind Speed
+        </a>
+        <a asp-controller="Tools" asp-action="Converter" asp-route-category="Pressure" asp-route-from="hPa" asp-route-to="inHg"
+           class="btn @(Model.Category == "Pressure" ? "btn-modern-primary" : "btn-modern-outline") rounded-pill px-4">
+            ⏲️ Barometric Pressure
+        </a>
+        <a asp-controller="Tools" asp-action="Converter" asp-route-category="Rainfall" asp-route-from="mm" asp-route-to="in"
+           class="btn @(Model.Category == "Rainfall" ? "btn-modern-primary" : "btn-modern-outline") rounded-pill px-4">
+            🌧️ Precipitation
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Input Form -->
+        <div class="col-lg-6">
+            <div class="glass-panel p-4 h-100">
+                <h2 class="h5 fw-bold text-white mb-4">Convert @Model.Category</h2>
+
+                <form asp-controller="Tools" asp-action="Converter" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Category" value="@Model.Category" />
+
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-bold">Value to Convert</label>
+                        <input type="number" step="any" name="InputValue" value="@Model.InputValue" class="form-control form-glass fs-4 fw-bold" required>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">From Unit</label>
+                            <select name="FromUnit" class="form-select form-glass">
+                                @if (Model.Category == "Temperature")
+                                {
+                                    <option value="Celsius" selected="@(Model.FromUnit == "Celsius")">Celsius (°C)</option>
+                                    <option value="Fahrenheit" selected="@(Model.FromUnit == "Fahrenheit")">Fahrenheit (°F)</option>
+                                    <option value="Kelvin" selected="@(Model.FromUnit == "Kelvin")">Kelvin (K)</option>
+                                    <option value="Rankine" selected="@(Model.FromUnit == "Rankine")">Rankine (°R)</option>
+                                }
+                                else if (Model.Category == "WindSpeed")
+                                {
+                                    <option value="km/h" selected="@(Model.FromUnit == "km/h")">km/h (Kilometers / hour)</option>
+                                    <option value="mph" selected="@(Model.FromUnit == "mph")">mph (Miles / hour)</option>
+                                    <option value="m/s" selected="@(Model.FromUnit == "m/s")">m/s (Meters / second)</option>
+                                    <option value="knots" selected="@(Model.FromUnit == "knots")">knots (Nautical knots)</option>
+                                }
+                                else if (Model.Category == "Pressure")
+                                {
+                                    <option value="hPa" selected="@(Model.FromUnit == "hPa")">hPa / mbar</option>
+                                    <option value="inHg" selected="@(Model.FromUnit == "inHg")">inHg (Inches of mercury)</option>
+                                    <option value="mmHg" selected="@(Model.FromUnit == "mmHg")">mmHg (Torr)</option>
+                                    <option value="atm" selected="@(Model.FromUnit == "atm")">atm (Standard atmospheres)</option>
+                                    <option value="psi" selected="@(Model.FromUnit == "psi")">psi (Pounds/sq inch)</option>
+                                }
+                                else
+                                {
+                                    <option value="mm" selected="@(Model.FromUnit == "mm")">Millimeters (mm)</option>
+                                    <option value="cm" selected="@(Model.FromUnit == "cm")">Centimeters (cm)</option>
+                                    <option value="in" selected="@(Model.FromUnit == "in")">Inches (in)</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label text-secondary small fw-bold">To Unit</label>
+                            <select name="ToUnit" class="form-select form-glass">
+                                @if (Model.Category == "Temperature")
+                                {
+                                    <option value="Fahrenheit" selected="@(Model.ToUnit == "Fahrenheit")">Fahrenheit (°F)</option>
+                                    <option value="Celsius" selected="@(Model.ToUnit == "Celsius")">Celsius (°C)</option>
+                                    <option value="Kelvin" selected="@(Model.ToUnit == "Kelvin")">Kelvin (K)</option>
+                                    <option value="Rankine" selected="@(Model.ToUnit == "Rankine")">Rankine (°R)</option>
+                                }
+                                else if (Model.Category == "WindSpeed")
+                                {
+                                    <option value="mph" selected="@(Model.ToUnit == "mph")">mph (Miles / hour)</option>
+                                    <option value="km/h" selected="@(Model.ToUnit == "km/h")">km/h (Kilometers / hour)</option>
+                                    <option value="m/s" selected="@(Model.ToUnit == "m/s")">m/s (Meters / second)</option>
+                                    <option value="knots" selected="@(Model.ToUnit == "knots")">knots (Nautical knots)</option>
+                                }
+                                else if (Model.Category == "Pressure")
+                                {
+                                    <option value="inHg" selected="@(Model.ToUnit == "inHg")">inHg (Inches of mercury)</option>
+                                    <option value="hPa" selected="@(Model.ToUnit == "hPa")">hPa / mbar</option>
+                                    <option value="mmHg" selected="@(Model.ToUnit == "mmHg")">mmHg (Torr)</option>
+                                    <option value="atm" selected="@(Model.ToUnit == "atm")">atm (Standard atmospheres)</option>
+                                    <option value="psi" selected="@(Model.ToUnit == "psi")">psi (Pounds/sq inch)</option>
+                                }
+                                else
+                                {
+                                    <option value="in" selected="@(Model.ToUnit == "in")">Inches (in)</option>
+                                    <option value="mm" selected="@(Model.ToUnit == "mm")">Millimeters (mm)</option>
+                                    <option value="cm" selected="@(Model.ToUnit == "cm")">Centimeters (cm)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-modern-primary w-100 py-2">
+                        <i class="bi bi-arrow-repeat me-1"></i> Convert Value
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Result & Multi-Unit Matrix -->
+        <div class="col-lg-6">
+            <div class="glass-panel p-4 h-100">
+                <div class="p-4 rounded-3 mb-4 text-center" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.15)); border: 1px solid rgba(56, 189, 248, 0.3);">
+                    <small class="text-secondary text-uppercase fw-bold">Conversion Result</small>
+                    <div class="display-4 fw-extrabold text-white my-2">@Model.ConvertedResult</div>
+                    <div class="h5 text-info fw-bold mb-0">@Model.ToUnit</div>
+                    <small class="text-muted d-block mt-2 font-monospace">@Model.FormulaDescription</small>
+                </div>
+
+                <h3 class="h6 text-white mb-3"><i class="bi bi-grid-3x3-gap text-secondary me-1"></i> Instant Equivalent Matrix</h3>
+                <div class="row g-2">
+                    @foreach (var kvp in Model.QuickConversions)
+                    {
+                        <div class="col-6">
+                            <div class="p-2 px-3 rounded-2" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass-subtle);">
+                                <small class="text-secondary d-block">@kvp.Key</small>
+                                <span class="fw-bold text-white fs-5">@kvp.Value.ToString("N2")</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

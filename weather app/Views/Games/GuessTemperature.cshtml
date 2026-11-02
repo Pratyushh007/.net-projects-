@@ -1,0 +1,121 @@
+@model WeatherApp.Models.Tools.GuessGameViewModel
+@{
+    ViewData["Title"] = "Guess The Temperature Game (Project 1)";
+    int cityIndex = ViewBag.CityIndex ?? 0;
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-secondary">Project 1 &bull; Stage 1</span>
+                <span class="badge bg-info-subtle text-info">Focus: Syntax, Loops, Conditions, Methods</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-controller text-warning me-2"></i>Guess The Temperature Game</h1>
+        </div>
+        <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-outline btn-sm">
+            &larr; Weather Station
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <!-- Streak and Attempt Status -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning-subtle text-warning fs-6 px-3 py-2 rounded-pill">
+                        🔥 Current Streak: @Model.CurrentStreak
+                    </span>
+                    <span class="badge bg-secondary-subtle text-secondary fs-6 px-3 py-2 rounded-pill">
+                        🏆 Best: @Model.BestStreak
+                    </span>
+                </div>
+                <div class="text-secondary small">
+                    Attempts: <strong class="text-white">@Model.AttemptsUsed / @Model.MaxAttempts</strong>
+                </div>
+            </div>
+
+            <!-- Game Card -->
+            <div class="glass-panel p-4 p-md-5 text-center mb-4 position-relative overflow-hidden">
+                <small class="text-secondary text-uppercase fw-bold" style="letter-spacing: 0.1em;">Atmospheric Mystery Location</small>
+                
+                <h2 class="display-5 fw-extrabold text-white mt-1 mb-2">@Model.TargetCity, @Model.Country</h2>
+                
+                <div class="d-flex justify-content-center gap-3 my-3">
+                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                        <i class="bi bi-cloud-sun me-1"></i> @Model.ClueWeatherCondition
+                    </span>
+                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                        <i class="bi bi-wind me-1"></i> @Model.ClueWind
+                    </span>
+                </div>
+
+                <!-- Feedback Banner -->
+                @if (Model.UserGuess.HasValue)
+                {
+                    <div class="p-3 rounded-3 mb-4 @(Model.IsWinner ? "bg-success bg-opacity-25 border border-success" : (Model.IsGameOver ? "bg-danger bg-opacity-25 border border-danger" : "bg-dark border border-secondary"))">
+                        <div class="fs-5 fw-bold text-white mb-1">@Model.FeedbackMessage</div>
+                        @if (!Model.IsGameOver)
+                        {
+                            <small class="text-secondary">
+                                You guessed <strong class="text-warning">@Model.UserGuess.Value°C</strong>. 
+                                @(Model.MaxAttempts - Model.AttemptsUsed) attempt(s) remaining!
+                            </small>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-secondary mb-4">
+                        Analyze the weather clues above and predict the exact current temperature (°C).
+                    </p>
+                }
+
+                @if (!Model.IsGameOver)
+                {
+                    <!-- Guess Form -->
+                    <form asp-controller="Games" asp-action="GuessTemperature" method="get" class="mx-auto" style="max-width: 400px;">
+                        <input type="hidden" name="cityIndex" value="@cityIndex" />
+                        <input type="hidden" name="attempts" value="@Model.AttemptsUsed" />
+                        <input type="hidden" name="streak" value="@Model.CurrentStreak" />
+
+                        <div class="input-group input-group-lg mb-3">
+                            <input type="number" name="guess" class="form-control form-glass text-center fw-bold fs-3 text-white" placeholder="e.g. 18" min="-50" max="60" required autofocus>
+                            <span class="input-group-text bg-dark border-secondary text-white fw-bold">°C</span>
+                        </div>
+
+                        <button type="submit" class="btn btn-modern-primary w-100 py-3 fs-5">
+                            <i class="bi bi-send-check me-1"></i> Submit Temperature Guess
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <!-- Game Over Controls -->
+                    <div class="mt-4">
+                        @if (Model.IsWinner)
+                        {
+                            <div class="display-1 mb-2">🎉</div>
+                            <div class="h4 text-success fw-bold mb-3">Brilliant Meteorology Intuition!</div>
+                        }
+                        else
+                        {
+                            <div class="display-1 mb-2">❄️</div>
+                            <div class="h4 text-danger fw-bold mb-3">Better Luck Next Time!</div>
+                        }
+
+                        <a asp-controller="Games" asp-action="GuessTemperature" asp-route-streak="@Model.CurrentStreak" class="btn btn-modern-primary btn-lg px-4">
+                            <i class="bi bi-arrow-repeat me-1"></i> Next City Challenge
+                        </a>
+                    </div>
+                }
+            </div>
+
+            <!-- Algorithm & Stage 1 Spotlight Box -->
+            <div class="glass-panel p-3 text-secondary small">
+                <strong class="text-white d-block mb-1"><i class="bi bi-code-slash text-info me-1"></i> Stage 1 Concept Applied:</strong>
+                Implements the classic Number Guessing Game algorithm via recursive parameter passing, conditional branching (`diff < 0 ? Higher : Lower`), loop boundary validation, and streak state management.
+            </div>
+        </div>
+    </div>
+</div>

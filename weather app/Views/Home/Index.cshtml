@@ -1,0 +1,240 @@
+@model WeatherApp.Controllers.HomeDashboardViewModel
+@{
+    ViewData["Title"] = "Weather Ecosystem & 3-Stage Curriculum Hub";
+}
+
+<div class="container mt-4">
+    <!-- Hero Banner -->
+    <div class="glass-panel p-4 p-md-5 mb-5 position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(99, 102, 241, 0.15) 100%); border-color: rgba(56, 189, 248, 0.3);">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="badge bg-primary-subtle text-primary mb-3 px-3 py-2 rounded-pill fw-semibold" style="letter-spacing: 0.05em;">
+                    <i class="bi bi-stars me-1"></i> FULL-SPECTRUM METEOROLOGICAL PLATFORM
+                </span>
+                <h1 class="display-4 fw-extrabold mb-3">
+                    Atmosphere <span style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">360</span>
+                </h1>
+                <p class="lead text-secondary mb-4" style="max-width: 650px;">
+                    Experience real-time global weather intelligence powered by <strong>ASP.NET Core</strong>, <strong>Entity Framework Core</strong>, and live <strong>HTTP</strong> atmospheric APIs — interconnecting all 11 foundational projects across Syntax, OOP, and Modern Web Architecture.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3">
+                    <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-primary btn-lg">
+                        <i class="bi bi-cloud-sun me-2"></i> Launch Weather Station
+                    </a>
+                    <a asp-controller="Home" asp-action="Roadmap" class="btn btn-modern-outline btn-lg">
+                        <i class="bi bi-diagram-3 me-2"></i> Explore 3 Stages Roadmap
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 d-none d-lg-block text-center position-relative">
+                <div style="font-size: 8rem; animation: floatSlow 5s ease-in-out infinite; filter: drop-shadow(0 20px 30px rgba(56, 189, 248, 0.3));">
+                    🌦️
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Featured Cities Preview -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h3 class="h4 mb-1"><i class="bi bi-globe-americas me-2 text-info"></i>Global Weather Pulse</h3>
+                <p class="text-muted small mb-0">Live readings from premier meteorological stations</p>
+            </div>
+            <a asp-controller="Weather" asp-action="Index" class="small text-decoration-none">
+                View Detailed Station <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="row g-3">
+            @foreach (var city in Model.FeaturedCities)
+            {
+                <div class="col-md-4">
+                    <a asp-controller="Weather" asp-action="Index" asp-route-city="@city.CityName" class="text-decoration-none">
+                        <div class="glass-panel glass-panel-interactive p-4 h-100">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h4 class="h5 mb-0 text-white">@city.CityName</h4>
+                                    <small class="text-secondary">@city.Country</small>
+                                </div>
+                                <span class="badge-grade badge-grade-a">@city.ComfortGrade</span>
+                            </div>
+
+                            <div class="d-flex align-items-center justify-content-between mt-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span style="font-size: 2.2rem;">@city.Icon</span>
+                                    <span class="text-secondary small">@city.Condition</span>
+                                </div>
+                                <div class="text-end">
+                                    <div class="h2 mb-0 fw-bold text-white unit-celsius">@city.TempC.ToString("F1")°C</div>
+                                    <div class="h2 mb-0 fw-bold text-white unit-fahrenheit d-none">@((city.TempC * 9 / 5 + 32).ToString("F1"))°F</div>
+                                    <small class="text-muted"><i class="bi bi-wind"></i> @city.WindSpeed.ToString("F0") km/h</small>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Quick Stats Bar -->
+    <div class="row g-3 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="glass-panel p-3 text-center">
+                <i class="bi bi-heart-fill text-danger fs-4 mb-1"></i>
+                <div class="h3 fw-bold mb-0 text-white">@Model.FavoriteCitiesCount</div>
+                <small class="text-muted">Saved Cities</small>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="glass-panel p-3 text-center">
+                <i class="bi bi-journal-check text-info fs-4 mb-1"></i>
+                <div class="h3 fw-bold mb-0 text-white">@Model.NotesCount</div>
+                <small class="text-muted">Weather Notes</small>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="glass-panel p-3 text-center">
+                <i class="bi bi-check2-circle text-success fs-4 mb-1"></i>
+                <div class="h3 fw-bold mb-0 text-white">@Model.PendingTasksCount</div>
+                <small class="text-muted">Active Weather Tasks</small>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="glass-panel p-3 text-center">
+                <i class="bi bi-shield-check text-warning fs-4 mb-1"></i>
+                <div class="h3 fw-bold mb-0 text-white">@Model.EmergencyContactsCount</div>
+                <small class="text-muted">Emergency Contacts</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- The 3 Stages Section (Replicating the diagram from the user image) -->
+    <div class="mb-5">
+        <div class="text-center mb-4">
+            <h2 class="display-6 fw-bold">Three stages, from basics to the web</h2>
+            <p class="text-secondary">How each learning milestone is realized inside this comprehensive Weather App</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Stage 1: Console basics -->
+            <div class="col-lg-4">
+                <div class="stage-card">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="stage-badge-icon stage-1-icon">
+                                &gt;_
+                            </div>
+                            <span class="badge bg-secondary-subtle text-secondary">Projects 1–3</span>
+                        </div>
+                        <h3 class="h4 mb-2">Console basics</h3>
+                        <p class="text-secondary small mb-3">Fundamental programming building blocks translated into atmospheric calculation & gaming engines.</p>
+
+                        <ul class="list-unstyled mb-3">
+                            <li class="py-2 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-controller text-warning me-2"></i> Number Guessing Game</span>
+                                <a asp-controller="Games" asp-action="GuessTemperature" class="btn btn-sm btn-outline-info">Play</a>
+                            </li>
+                            <li class="py-2 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-calculator text-info me-2"></i> Simple Calculator</span>
+                                <a asp-controller="Tools" asp-action="Calculator" class="btn btn-sm btn-outline-info">Compute</a>
+                            </li>
+                            <li class="py-2 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-arrow-left-right text-primary me-2"></i> Unit Converter</span>
+                                <a asp-controller="Tools" asp-action="Converter" class="btn btn-sm btn-outline-info">Convert</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="stage-focus-tag w-100 text-center">
+                            <strong>Focus:</strong> Syntax, loops, conditions, methods
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 2: Data & OOP -->
+            <div class="col-lg-4">
+                <div class="stage-card">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="stage-badge-icon stage-2-icon">
+                                📦
+                            </div>
+                            <span class="badge bg-secondary-subtle text-secondary">Projects 4–8</span>
+                        </div>
+                        <h3 class="h4 mb-2">Data & OOP</h3>
+                        <p class="text-secondary small mb-3">Object-oriented architectures, collections, and LINQ aggregations powering weather intelligence.</p>
+
+                        <ul class="list-unstyled mb-3">
+                            <li class="py-2 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-check2-square text-success me-2"></i> To-Do List</span>
+                                <a asp-controller="Planner" asp-action="Todo" class="btn btn-sm btn-outline-info">Planner</a>
+                            </li>
+                            <li class="py-2 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-award text-warning me-2"></i> Student Grade Manager</span>
+                                <a asp-controller="Planner" asp-action="Grades" class="btn btn-sm btn-outline-info">Report Card</a>
+                            </li>
+                            <li class="py-2 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-patch-question text-info me-2"></i> Quiz App</span>
+                                <a asp-controller="Games" asp-action="Quiz" class="btn btn-sm btn-outline-info">Quiz</a>
+                            </li>
+                            <li class="py-2 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-wallet2 text-emerald me-2"></i> Bank Account Simulator</span>
+                                <a asp-controller="Tools" asp-action="EnergyBudget" class="btn btn-sm btn-outline-info">Wallet</a>
+                            </li>
+                            <li class="py-2 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-shield-lock text-danger me-2"></i> Password Generator</span>
+                                <a asp-controller="Tools" asp-action="Password" class="btn btn-sm btn-outline-info">Generate</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="stage-focus-tag w-100 text-center">
+                            <strong>Focus:</strong> Classes, collections, LINQ, files
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 3: Web & APIs -->
+            <div class="col-lg-4">
+                <div class="stage-card" style="border-color: rgba(56, 189, 248, 0.4); box-shadow: var(--shadow-glow);">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="stage-badge-icon stage-3-icon">
+                                🌐
+                            </div>
+                            <span class="badge bg-primary">Projects 9–11 (Target)</span>
+                        </div>
+                        <h3 class="h4 mb-2">Web & APIs</h3>
+                        <p class="text-secondary small mb-3">Production web frameworks, REST API communication, and SQLite database persistence.</p>
+
+                        <ul class="list-unstyled mb-3">
+                            <li class="py-2 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-journal-richtext text-info me-2"></i> Personal Notes Web App</span>
+                                <a asp-controller="Notes" asp-action="Index" class="btn btn-sm btn-outline-info">Notes</a>
+                            </li>
+                            <li class="py-2 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center bg-primary-subtle bg-opacity-10 px-2 rounded">
+                                <span class="fw-bold text-white"><i class="bi bi-cloud-sun text-warning me-2"></i> Weather App</span>
+                                <a asp-controller="Weather" asp-action="Index" class="btn btn-sm btn-modern-primary">Live App</a>
+                            </li>
+                            <li class="py-2 d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-telephone-plus text-danger me-2"></i> Contact Book API</span>
+                                <a asp-controller="Contacts" asp-action="Index" class="btn btn-sm btn-outline-info">Directory & API</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <span class="stage-focus-tag w-100 text-center" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">
+                            <strong>Focus:</strong> ASP.NET Core, EF Core, HTTP
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

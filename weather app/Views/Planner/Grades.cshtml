@@ -1,0 +1,117 @@
+@model WeatherApp.Models.Tools.GradeReportCardViewModel
+@{
+    ViewData["Title"] = "City Weather Report Card & Grade Manager (Project 5)";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary">Project 5 &bull; Stage 2</span>
+                <span class="badge bg-primary-subtle text-primary">Focus: Classes, Collections, LINQ, Files</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-award text-warning me-2"></i>City Weather Report Card & Grade Manager</h1>
+        </div>
+        <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-outline btn-sm">
+            &larr; Weather Station
+        </a>
+    </div>
+
+    <!-- Class Statistics Overview (Calculated via LINQ) -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="glass-panel p-3 text-center">
+                <small class="text-secondary text-uppercase fw-bold">Class Average Score</small>
+                <div class="display-6 fw-bold text-white my-1">@Model.AverageScore <span class="fs-6 text-muted">/ 100</span></div>
+                <span class="badge bg-primary">Grade: @Model.ClassAverageGrade</span>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="glass-panel p-3 text-center">
+                <small class="text-secondary text-uppercase fw-bold">Valedictorian City 🏆</small>
+                <div class="h4 fw-bold text-success my-1">@(Model.ValedictorianCity?.CityName ?? "N/A")</div>
+                <small class="text-muted">Top score: @(Model.ValedictorianCity?.ComfortScore.ToString("F0") ?? "0") pts (@Model.ValedictorianCity?.LetterGrade)</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="glass-panel p-3 text-center">
+                <small class="text-secondary text-uppercase fw-bold">Most Extreme / Challenging</small>
+                <div class="h4 fw-bold text-warning my-1">@(Model.NeedsImprovementCity?.CityName ?? "N/A")</div>
+                <small class="text-muted">Score: @(Model.NeedsImprovementCity?.ComfortScore.ToString("F0") ?? "0") pts (@Model.NeedsImprovementCity?.LetterGrade)</small>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="glass-panel p-3 text-center">
+                <small class="text-secondary text-uppercase fw-bold">Graded Locations</small>
+                <div class="display-6 fw-bold text-info my-1">@Model.GradedCities.Count</div>
+                <small class="text-muted">Analyzed via LINQ Aggregations</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Report Card Table -->
+    <div class="glass-panel p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="h5 fw-bold text-white mb-0">Atmospheric Academic Transcript</h2>
+                <small class="text-secondary">Composite evaluation across temperature equilibrium, moisture, wind buffeting, and UV exposure</small>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0" style="background: transparent;">
+                <thead>
+                    <tr class="border-secondary text-secondary small">
+                        <th>Rank</th>
+                        <th>City & Region</th>
+                        <th>Temp (°C)</th>
+                        <th>Humidity</th>
+                        <th>Wind</th>
+                        <th>Score</th>
+                        <th>Letter Grade</th>
+                        <th>GPA Equiv</th>
+                        <th>Evaluator Remarks</th>
+                    </tr>
+                </thead>
+                <tbody class="border-secondary">
+                    @for (int i = 0; i < Model.GradedCities.Count; i++)
+                    {
+                        var city = Model.GradedCities[i];
+                        <tr>
+                            <td class="fw-bold text-muted">#@(i + 1)</td>
+                            <td>
+                                <a asp-controller="Weather" asp-action="Index" asp-route-city="@city.CityName" class="text-white fw-bold text-decoration-none">
+                                    @city.CityName
+                                </a>
+                                <small class="text-secondary d-block">@city.Country</small>
+                            </td>
+                            <td class="fw-semibold">@city.TemperatureC.ToString("F1")°C</td>
+                            <td>@city.Humidity.ToString("F0")%</td>
+                            <td>@city.WindSpeedKmh.ToString("F0") km/h</td>
+                            <td>
+                                <strong class="text-info">@city.ComfortScore.ToString("F0")</strong>
+                                <span class="text-muted small">/ 100</span>
+                            </td>
+                            <td>
+                                <span class="badge-grade @(city.LetterGrade.StartsWith("A") ? "badge-grade-a" : (city.LetterGrade.StartsWith("B") ? "badge-grade-b" : (city.LetterGrade.StartsWith("C") ? "badge-grade-c" : "badge-grade-f")))">
+                                    @city.LetterGrade
+                                </span>
+                            </td>
+                            <td class="fw-bold text-secondary">@city.GPAEquivalent</td>
+                            <td>
+                                <span class="text-white small d-block">@city.PrimaryComment</span>
+                                @if (city.StrengthPoints.Any())
+                                {
+                                    <small class="text-success"><i class="bi bi-plus-circle"></i> @city.StrengthPoints.First()</small>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

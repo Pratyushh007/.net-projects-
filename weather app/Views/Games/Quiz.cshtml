@@ -1,0 +1,137 @@
+@model WeatherApp.Models.Tools.QuizSessionViewModel
+@{
+    ViewData["Title"] = "Meteorology & Extreme Weather Quiz (Project 6)";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-primary">Project 6 &bull; Stage 2</span>
+                <span class="badge bg-primary-subtle text-primary">Focus: Classes, Collections, LINQ, Files</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-patch-question text-info me-2"></i>Meteorology & Atmospheric Quiz</h1>
+        </div>
+        <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-outline btn-sm">
+            &larr; Weather Station
+        </a>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-lg-8">
+            <!-- Feedback Toast / Banner from previous question -->
+            @if (TempData["FeedbackText"] != null)
+            {
+                <div class="alert @(TempData["WasCorrect"] as bool? == true ? "alert-success border-success" : "alert-danger border-danger") bg-opacity-25 glass-panel text-white mb-4">
+                    <div class="fw-semibold">@TempData["FeedbackText"]</div>
+                </div>
+            }
+
+            @if (!Model.IsFinished && Model.CurrentQuestion != null)
+            {
+                <!-- Progress Header -->
+                <div class="glass-panel p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-info-subtle text-info px-3 py-1 rounded-pill">
+                            Question @(Model.CurrentQuestionIndex + 1) of @Model.TotalQuestions &bull; @Model.CurrentQuestion.Category
+                        </span>
+                        <div class="fw-bold text-white">
+                            Current Score: <span class="text-info">@Model.Score</span>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-4" style="height: 6px; background: rgba(255,255,255,0.1);">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: @((Model.CurrentQuestionIndex) * 100 / Model.TotalQuestions)%;"></div>
+                    </div>
+
+                    <!-- Question Prompt -->
+                    <h2 class="h4 fw-bold text-white mb-4">
+                        @Model.CurrentQuestion.QuestionText
+                    </h2>
+
+                    <!-- Answer Options Form -->
+                    <form asp-controller="Games" asp-action="SubmitQuizAnswer" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="qIndex" value="@Model.CurrentQuestionIndex" />
+                        <input type="hidden" name="currentScore" value="@Model.Score" />
+
+                        <div class="d-flex flex-column gap-3 mb-4">
+                            @for (int i = 0; i < Model.CurrentQuestion.Options.Count; i++)
+                            {
+                                var opt = Model.CurrentQuestion.Options[i];
+                                <label class="p-3 rounded-3 d-flex align-items-center gap-3 cursor-pointer transition border border-secondary border-opacity-25" style="background: rgba(255, 255, 255, 0.03);">
+                                    <input type="radio" name="selectedOption" value="@i" class="form-check-input mt-0" required>
+                                    <span class="text-white fw-medium">@opt</span>
+                                </label>
+                            }
+                        </div>
+
+                        <button type="submit" class="btn btn-modern-primary w-100 py-3 fs-5">
+                            Submit Answer & Next &rarr;
+                        </button>
+                    </form>
+                </div>
+            }
+            else
+            {
+                <!-- Quiz Completion Card -->
+                <div class="glass-panel p-4 p-md-5 text-center mb-4">
+                    <div class="display-1 mb-2">🏆</div>
+                    <h2 class="display-6 fw-bold text-white mb-2">Quiz Completed!</h2>
+                    <p class="text-secondary fs-5 mb-4">
+                        You scored <strong class="text-info fs-3">@Model.Score</strong> out of <strong>@Model.TotalQuestions</strong>
+                        (@Math.Round((double)Model.Score / Model.TotalQuestions * 100)% accuracy)
+                    </p>
+
+                    <!-- Save Score to EF Core Form -->
+                    <form asp-controller="Games" asp-action="SaveQuizScore" method="post" class="mx-auto mb-4" style="max-width: 400px;">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="finalScore" value="@Model.Score" />
+                        <input type="hidden" name="totalQuestions" value="@Model.TotalQuestions" />
+
+                        <div class="input-group mb-3">
+                            <input type="text" name="playerName" class="form-control form-glass text-white" placeholder="Enter your name..." required>
+                            <button type="submit" class="btn btn-modern-primary">Save to Board</button>
+                        </div>
+                    </form>
+
+                    <a asp-controller="Games" asp-action="Quiz" class="btn btn-modern-outline">
+                        <i class="bi bi-arrow-repeat me-1"></i> Retake Quiz
+                    </a>
+                </div>
+            }
+
+            <!-- Global Leaderboard (EF Core LINQ) -->
+            @if (Model.Leaderboard.Any())
+            {
+                <div class="glass-panel p-4">
+                    <h3 class="h6 fw-bold text-white mb-3"><i class="bi bi-trophy text-warning me-1"></i> Global Quiz Hall of Fame (EF Core)</h3>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover table-sm align-middle mb-0" style="background: transparent;">
+                            <thead>
+                                <tr class="border-secondary text-secondary small">
+                                    <th>Rank</th>
+                                    <th>Player</th>
+                                    <th>Score</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="border-secondary">
+                                @for (int i = 0; i < Model.Leaderboard.Count; i++)
+                                {
+                                    var entry = Model.Leaderboard[i];
+                                    <tr>
+                                        <td class="text-muted fw-bold">#@(i + 1)</td>
+                                        <td class="text-white fw-semibold">@entry.PlayerName</td>
+                                        <td><span class="badge bg-primary">@entry.Score / @entry.TotalQuestions</span></td>
+                                        <td class="text-secondary small">@entry.PlayedAt.ToString("MMM dd, yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

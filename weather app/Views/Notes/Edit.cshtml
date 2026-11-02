@@ -1,0 +1,65 @@
+@model WeatherApp.Models.Entities.WeatherNote
+@{
+    ViewData["Title"] = "Edit Weather Note";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-pencil text-info me-2"></i>Edit Weather Note</h1>
+                <a asp-controller="Notes" asp-action="Index" class="btn btn-modern-outline btn-sm">&larr; Back to Notes</a>
+            </div>
+
+            <div class="glass-panel p-4 p-md-5">
+                <form asp-controller="Notes" asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Note Title</label>
+                        <input type="text" name="Title" value="@Model.Title" class="form-control form-glass fs-5 text-white" required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small fw-bold">Location City</label>
+                            <input type="text" name="CityName" value="@Model.CityName" class="form-control form-glass text-white" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small fw-bold">Category</label>
+                            <select name="Category" class="form-select form-glass">
+                                <option value="Daily" selected="@(Model.Category == "Daily")">Daily Weather</option>
+                                <option value="Travel" selected="@(Model.Category == "Travel")">Travel & Packing</option>
+                                <option value="Photography" selected="@(Model.Category == "Photography")">Golden Hour / Photography</option>
+                                <option value="Severe Weather" selected="@(Model.Category == "Severe Weather")">Severe Storms / Prep</option>
+                                <option value="Agriculture" selected="@(Model.Category == "Agriculture")">Gardening & Farming</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small fw-bold">Ambient Temp Snapshot (°C)</label>
+                            <input type="number" step="0.1" name="TemperatureC" value="@Model.TemperatureC" class="form-control form-glass text-white">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small fw-bold">Condition Snapshot</label>
+                            <input type="text" name="Condition" value="@Model.Condition" class="form-control form-glass text-white">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-bold">Observation Details & Notes</label>
+                        <textarea name="Content" rows="6" class="form-control form-glass text-white" required>@Model.Content</textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-controller="Notes" asp-action="Index" class="btn btn-modern-outline px-4">Cancel</a>
+                        <button type="submit" class="btn btn-modern-primary px-5">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

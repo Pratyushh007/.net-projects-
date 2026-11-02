@@ -1,0 +1,143 @@
+@model WeatherApp.Models.Tools.AtmosphericCalculatorModel
+@{
+    ViewData["Title"] = "Atmospheric Comfort Calculator (Project 2)";
+}
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-secondary">Project 2 &bull; Stage 1</span>
+                <span class="badge bg-info-subtle text-info">Focus: Syntax, Conditions, Methods</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-0"><i class="bi bi-calculator text-info me-2"></i>Atmospheric & Thermal Comfort Calculator</h1>
+        </div>
+        <a asp-controller="Weather" asp-action="Index" class="btn btn-modern-outline btn-sm">
+            &larr; Weather Station
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <!-- Input Form -->
+        <div class="col-lg-5">
+            <div class="glass-panel p-4">
+                <h2 class="h5 fw-bold text-white mb-3">Parameters</h2>
+                <form asp-controller="Tools" asp-action="Calculator" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Ambient Temperature (°C)</label>
+                        <input type="number" step="0.1" name="TemperatureC" value="@Model.TemperatureC" class="form-control form-glass" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Relative Humidity (%)</label>
+                        <input type="number" step="1" min="1" max="100" name="RelativeHumidity" value="@Model.RelativeHumidity" class="form-control form-glass" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Wind Speed (km/h)</label>
+                        <input type="number" step="0.1" min="0" name="WindSpeedKmh" value="@Model.WindSpeedKmh" class="form-control form-glass" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Barometric Pressure (hPa)</label>
+                        <input type="number" step="0.1" name="PressureHpa" value="@Model.PressureHpa" class="form-control form-glass" required>
+                    </div>
+
+                    <hr class="border-secondary opacity-25 my-3">
+
+                    <h3 class="h6 text-white mb-3"><i class="bi bi-droplet-half text-info me-1"></i> Rain Harvesting Estimator</h3>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-bold">Precipitation / Rainfall (mm)</label>
+                        <input type="number" step="0.1" min="0" name="RainfallMm" value="@Model.RainfallMm" class="form-control form-glass">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small fw-bold">Roof Catchment Area (m²)</label>
+                        <input type="number" step="1" min="1" name="RoofAreaSqMeters" value="@Model.RoofAreaSqMeters" class="form-control form-glass">
+                    </div>
+
+                    <button type="submit" class="btn btn-modern-primary w-100 py-2">
+                        <i class="bi bi-cpu me-1"></i> Calculate Atmospheric Outputs
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Calculated Metrics Outputs -->
+        <div class="col-lg-7">
+            <div class="glass-panel p-4 mb-4">
+                <h2 class="h5 fw-bold text-white mb-3">Computed Meteorological Indices</h2>
+                <p class="text-secondary small mb-4">Calculated using standard NOAA, Magnus-Tetens, and thermodynamic gas equations implemented in C# methods.</p>
+
+                <div class="row g-3 mb-4">
+                    <!-- Heat Index -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3" style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2);">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-muted fw-bold text-uppercase">Heat Index (Apparent)</span>
+                                <span>🔥</span>
+                            </div>
+                            <div class="display-6 fw-bold text-white">@Model.HeatIndexC.ToString("F1")°C</div>
+                            <small class="text-warning d-block mt-1">@Model.HeatRiskLevel</small>
+                        </div>
+                    </div>
+
+                    <!-- Wind Chill -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3" style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2);">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-muted fw-bold text-uppercase">Wind Chill</span>
+                                <span>❄️</span>
+                            </div>
+                            <div class="display-6 fw-bold text-white">@Model.WindChillC.ToString("F1")°C</div>
+                            <small class="text-info d-block mt-1">@Model.FrostbiteRisk</small>
+                        </div>
+                    </div>
+
+                    <!-- Dew Point -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3" style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.2);">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-muted fw-bold text-uppercase">Dew Point</span>
+                                <span>💧</span>
+                            </div>
+                            <div class="display-6 fw-bold text-white">@Model.DewPointC.ToString("F1")°C</div>
+                            <small class="text-secondary d-block mt-1">Saturation temperature where dew condenses</small>
+                        </div>
+                    </div>
+
+                    <!-- Air Density -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="small text-muted fw-bold text-uppercase">Dry Air Density</span>
+                                <span>🎈</span>
+                            </div>
+                            <div class="display-6 fw-bold text-white">@Model.AirDensityKgM3.ToString("F3") <small class="fs-6 fw-normal">kg/m³</small></div>
+                            <small class="text-secondary d-block mt-1">Directly impacts aircraft lift & wind turbine output</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rain Harvesting -->
+                <div class="p-3 rounded-3 mb-3" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-glass-subtle);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="fw-bold text-white"><i class="bi bi-bucket-fill text-info me-2"></i>Estimated Rain Harvest Collection</div>
+                            <small class="text-secondary">@Model.RainfallMm mm over @Model.RoofAreaSqMeters m² catchment at 90% runoff</small>
+                        </div>
+                        <div class="h3 fw-bold text-info mb-0">@Model.RainHarvestLiters.ToString("N1") Liters</div>
+                    </div>
+                </div>
+
+                <div class="alert alert-dark border-secondary bg-opacity-25 p-3 mb-0">
+                    <strong class="text-white d-block mb-1"><i class="bi bi-info-circle me-1"></i> Summary:</strong>
+                    <span class="text-secondary small">@Model.CalculationSummary</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

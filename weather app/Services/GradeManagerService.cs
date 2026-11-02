@@ -15,13 +15,12 @@ public class GradeManagerService : IGradeManagerService
 
     public async Task<GradeReportCardViewModel> GenerateReportCardAsync(CancellationToken cancellationToken = default)
     {
-        // LINQ: Retrieve distinct cities from recent search history and favorites
+
         var historyList = await _dbContext.SearchHistories
             .OrderByDescending(s => s.SearchedAt)
             .Take(30)
             .ToListAsync(cancellationToken);
 
-        // Group by city name using LINQ to get the latest weather metrics
         var latestPerCity = historyList
             .GroupBy(h => h.CityName.ToLower())
             .Select(g => g.First())
@@ -43,7 +42,6 @@ public class GradeManagerService : IGradeManagerService
             gradedList.Add(grade);
         }
 
-        // If not enough cities in history, provide standard global cities
         if (gradedList.Count < 3)
         {
             gradedList.Add(GradeSingleCity("Tokyo", "Japan", 21.0, 52.0, 12.0, 4.5, 0.0));
@@ -53,7 +51,6 @@ public class GradeManagerService : IGradeManagerService
             gradedList.Add(GradeSingleCity("Dubai", "United Arab Emirates", 36.5, 45.0, 18.0, 9.5, 0.0));
         }
 
-        // LINQ: Ordering, Average, and Extremes
         var sorted = gradedList.OrderByDescending(c => c.ComfortScore).ToList();
         double avgScore = sorted.Average(c => c.ComfortScore);
 
@@ -73,7 +70,6 @@ public class GradeManagerService : IGradeManagerService
         var strengths = new List<string>();
         var improvements = new List<string>();
 
-        // 1. Temperature Grading (Ideal: 20 - 24 °C)
         double tempDelta = Math.Abs(tempC - 22.0);
         if (tempDelta <= 2.5)
         {
@@ -86,7 +82,6 @@ public class GradeManagerService : IGradeManagerService
             improvements.Add(tempC > 24 ? $"High heat deviation (+{tempDelta:F1}°C above optimal)" : $"Cold chill deviation (-{tempDelta:F1}°C below optimal)");
         }
 
-        // 2. Humidity Grading (Ideal: 40 - 55%)
         if (humidity >= 40 && humidity <= 55)
         {
             strengths.Add($"Crisp, comfortable relative humidity ({humidity:F0}%)");
@@ -98,7 +93,6 @@ public class GradeManagerService : IGradeManagerService
             improvements.Add(humidity > 55 ? "Muggy moisture level" : "Arid dry air");
         }
 
-        // 3. Wind speed Grading (Ideal: < 18 km/h)
         if (windSpeed <= 18)
         {
             strengths.Add("Gentle atmospheric breezes");
@@ -109,7 +103,6 @@ public class GradeManagerService : IGradeManagerService
             improvements.Add($"Brisk wind buffeting ({windSpeed:F0} km/h)");
         }
 
-        // 4. Rain & UV
         if (rain > 0)
         {
             score -= 15 + (rain * 2);

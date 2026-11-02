@@ -63,7 +63,6 @@ public class ContactsController : Controller
     }
 }
 
-// RESTful Web API Controller for Project 11: Contact Book API
 [ApiController]
 [Route("api/[controller]")]
 public class ContactsApiController : ControllerBase
@@ -75,7 +74,6 @@ public class ContactsApiController : ControllerBase
         _dbContext = dbContext;
     }
 
-    // GET: api/contactsapi
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EmergencyContact>>> GetContacts([FromQuery] string? city, [FromQuery] string? category)
     {
@@ -90,7 +88,6 @@ public class ContactsApiController : ControllerBase
         return await query.OrderBy(c => c.PriorityLevel).ToListAsync();
     }
 
-    // GET: api/contactsapi/5
     [HttpGet("{id}")]
     public async Task<ActionResult<EmergencyContact>> GetContact(int id)
     {
@@ -101,7 +98,6 @@ public class ContactsApiController : ControllerBase
         return contact;
     }
 
-    // POST: api/contactsapi
     [HttpPost]
     public async Task<ActionResult<EmergencyContact>> CreateContact([FromBody] EmergencyContact contact)
     {
@@ -114,7 +110,6 @@ public class ContactsApiController : ControllerBase
         return CreatedAtAction(nameof(GetContact), new { id = contact.Id }, contact);
     }
 
-    // PUT: api/contactsapi/5
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateContact(int id, [FromBody] EmergencyContact contact)
     {
@@ -138,7 +133,6 @@ public class ContactsApiController : ControllerBase
         return Ok(existing);
     }
 
-    // DELETE: api/contactsapi/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteContact(int id)
     {

@@ -18,12 +18,12 @@
     </div>
 
     <div class="row g-4 mb-4">
-        <!-- Account Balance Card -->
+
         <div class="col-lg-4">
             <div class="glass-panel p-4 h-100" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(15, 23, 42, 0.4)); border-color: rgba(16, 185, 129, 0.3);">
                 <small class="text-secondary text-uppercase fw-bold">@Model.Account.AccountName</small>
                 <div class="display-5 fw-extrabold text-white my-2">@Model.Account.CurrentBalance.ToString("C")</div>
-                
+
                 <div class="d-flex justify-content-between text-secondary small py-2 border-top border-secondary border-opacity-25 mt-3">
                     <span>Monthly Reserve:</span>
                     <strong class="text-white">@Model.Account.MonthlyBudget.ToString("C")</strong>
@@ -39,7 +39,6 @@
             </div>
         </div>
 
-        <!-- Real-Time Atmospheric Cost Projection -->
         <div class="col-lg-4">
             <div class="glass-panel p-4 h-100">
                 <small class="text-secondary text-uppercase fw-bold">Live Climate HVAC Impact</small>
@@ -59,7 +58,6 @@
             </div>
         </div>
 
-        <!-- Thermostat Settings -->
         <div class="col-lg-4">
             <div class="glass-panel p-4 h-100">
                 <h2 class="h6 fw-bold text-white mb-3"><i class="bi bi-thermometer-half text-danger me-1"></i> Adjust Thermostat & Rate</h2>
@@ -86,9 +84,8 @@
         </div>
     </div>
 
-    <!-- Quick Transaction Injection & Savings Tips -->
     <div class="row g-4 mb-4">
-        <!-- New Transaction Form -->
+
         <div class="col-lg-5">
             <div class="glass-panel p-4">
                 <h3 class="h6 fw-bold text-white mb-3"><i class="bi bi-plus-circle text-info me-1"></i> Record Energy Expense or Solar Credit</h3>
@@ -128,7 +125,6 @@
             </div>
         </div>
 
-        <!-- Climate Tips & Transaction History -->
         <div class="col-lg-7">
             <div class="glass-panel p-4 mb-4">
                 <h3 class="h6 fw-bold text-white mb-3"><i class="bi bi-lightbulb text-warning me-1"></i> Active Meteorological Energy Conservation Tips</h3>

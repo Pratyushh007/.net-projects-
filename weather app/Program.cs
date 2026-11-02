@@ -4,21 +4,17 @@ using WeatherApp.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Register SQLite EF Core DbContext
 builder.Services.AddDbContext<WeatherDbContext>(options =>
     options.UseSqlite("Data Source=weatherapp.db"));
 
-// Register named HttpClient for weather and geocoding APIs
 builder.Services.AddHttpClient("WeatherApi", client =>
 {
     client.Timeout = TimeSpan.FromSeconds(10);
     client.DefaultRequestHeaders.Add("User-Agent", "Atmosphere360-WeatherApp/1.0 (ASP.NET Core)");
 });
 
-// Register Domain & Tool Services
 builder.Services.AddScoped<IWeatherService, WeatherService>();
 builder.Services.AddScoped<IWeatherCalculations, WeatherCalculations>();
 builder.Services.AddScoped<IGradeManagerService, GradeManagerService>();
@@ -26,7 +22,6 @@ builder.Services.AddScoped<IFileExportService, FileExportService>();
 
 var app = builder.Build();
 
-// Initialize and seed SQLite database
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -42,7 +37,6 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

@@ -17,7 +17,6 @@
         </a>
     </div>
 
-    <!-- Category Tabs -->
     <div class="d-flex gap-2 mb-4 overflow-x-auto pb-2">
         <a asp-controller="Tools" asp-action="Converter" asp-route-category="Temperature" asp-route-from="Celsius" asp-route-to="Fahrenheit"
            class="btn @(Model.Category == "Temperature" ? "btn-modern-primary" : "btn-modern-outline") rounded-pill px-4">
@@ -38,7 +37,7 @@
     </div>
 
     <div class="row g-4">
-        <!-- Input Form -->
+
         <div class="col-lg-6">
             <div class="glass-panel p-4 h-100">
                 <h2 class="h5 fw-bold text-white mb-4">Convert @Model.Category</h2>
@@ -129,7 +128,6 @@
             </div>
         </div>
 
-        <!-- Result & Multi-Unit Matrix -->
         <div class="col-lg-6">
             <div class="glass-panel p-4 h-100">
                 <div class="p-4 rounded-3 mb-4 text-center" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.15)); border: 1px solid rgba(56, 189, 248, 0.3);">

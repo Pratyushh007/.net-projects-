@@ -31,7 +31,7 @@ public class WeatherNote
     public string CityName { get; set; } = string.Empty;
     public double? TemperatureC { get; set; }
     public string? Condition { get; set; }
-    public string Category { get; set; } = "General"; // Travel, Severe Weather, Photography, Agriculture, Daily
+    public string Category { get; set; } = "General";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 }
@@ -41,12 +41,12 @@ public class WeatherTodoItem
     public int Id { get; set; }
     public string TaskDescription { get; set; } = string.Empty;
     public string TargetCity { get; set; } = string.Empty;
-    public string RequiredWeatherType { get; set; } = "Any"; // Sunny, Clear, Rain, Mild, Snow, Indoors
+    public string RequiredWeatherType { get; set; } = "Any";
     public double? MinTemp { get; set; }
     public double? MaxTemp { get; set; }
     public bool RequiresNoRain { get; set; }
     public bool IsCompleted { get; set; }
-    public string Priority { get; set; } = "Normal"; // Low, Normal, High
+    public string Priority { get; set; } = "Normal";
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
 
@@ -58,8 +58,8 @@ public class EmergencyContact
     public string Phone { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string CityOrRegion { get; set; } = string.Empty;
-    public string Category { get; set; } = "Emergency Services"; // Storm Shelter, Flood Hotline, Road Assistance, Coast Guard, Medical
-    public int PriorityLevel { get; set; } = 1; // 1 = Critical, 2 = Warning, 3 = Advisory
+    public string Category { get; set; } = "Emergency Services";
+    public int PriorityLevel { get; set; } = 1;
     public string? Notes { get; set; }
 }
 
@@ -90,7 +90,7 @@ public class EnergyTransaction
     public int EnergyAccountId { get; set; }
     public string Description { get; set; } = string.Empty;
     public decimal Amount { get; set; }
-    public bool IsDeposit { get; set; } // true = deposit/rebate, false = expense
+    public bool IsDeposit { get; set; }
     public string WeatherImpactReason { get; set; } = string.Empty;
     public DateTime Date { get; set; } = DateTime.UtcNow;
 }

@@ -44,7 +44,6 @@ public class WeatherService : IWeatherService
             _logger.LogWarning(ex, "Failed to search cities via Open-Meteo for '{Query}'", query);
         }
 
-        // Fallback local search matching known cities
         return GetKnownCities()
             .Where(c => c.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
                         (c.Country != null && c.Country.Contains(query, StringComparison.OrdinalIgnoreCase)))
@@ -55,7 +54,6 @@ public class WeatherService : IWeatherService
     {
         cityName = string.IsNullOrWhiteSpace(cityName) ? "London" : cityName.Trim();
 
-        // 1. Resolve coordinates if not provided
         double latitude = lat ?? 51.5074;
         double longitude = lon ?? -0.1278;
         string country = "United Kingdom";
@@ -94,7 +92,6 @@ public class WeatherService : IWeatherService
         string country = "GPS Coordinates";
         string? adminArea = null;
 
-        // Try reverse geocoding approximation by searching nearby or using coordinate title
         return await FetchAndBuildWeatherModelAsync(cityName, country, adminArea, latitude, longitude, cancellationToken);
     }
 
@@ -121,7 +118,6 @@ public class WeatherService : IWeatherService
             _logger.LogWarning(ex, "Failed to call Open-Meteo for {City}. Using fallback mock dataset.", cityName);
         }
 
-        // Build ViewModel
         var vm = new WeatherViewModel
         {
             CityName = cityName,
@@ -152,7 +148,7 @@ public class WeatherService : IWeatherService
         }
         else
         {
-            // Offline realistic fallback
+
             vm.CurrentTempC = 19.5;
             vm.FeelsLikeC = 19.0;
             vm.Humidity = 58;
@@ -167,7 +163,6 @@ public class WeatherService : IWeatherService
             vm.ThemeClass = "theme-clear-day";
         }
 
-        // Hourly forecast (extract next 24 entries)
         if (meteoData?.Hourly?.Time != null && meteoData.Hourly.Temperature != null)
         {
             var count = Math.Min(24, meteoData.Hourly.Time.Count);
@@ -191,7 +186,7 @@ public class WeatherService : IWeatherService
         }
         else
         {
-            // Simulated 24-hour curve
+
             for (int h = 0; h < 24; h++)
             {
                 var simTemp = vm.CurrentTempC + Math.Sin(h * Math.PI / 12) * 5.0;
@@ -206,7 +201,6 @@ public class WeatherService : IWeatherService
             }
         }
 
-        // Daily 7-day forecast
         if (meteoData?.Daily?.Time != null && meteoData.Daily.TempMax != null && meteoData.Daily.TempMin != null)
         {
             var dayCount = Math.Min(7, meteoData.Daily.Time.Count);
@@ -275,13 +269,10 @@ public class WeatherService : IWeatherService
             }
         }
 
-        // Calculate Comfort Grade (Project 5: Student Grade Manager)
         CalculateComfortGrade(vm);
 
-        // Generate dynamic health and lifestyle advice (Syntax, loops, conditions, methods - Stage 1 focus!)
         GenerateWeatherAdvice(vm);
 
-        // Record search in EF Core database history (EF Core focus)
         try
         {
             _dbContext.SearchHistories.Add(new SearchHistory
@@ -301,7 +292,6 @@ public class WeatherService : IWeatherService
             _logger.LogWarning(ex, "Failed to persist search history for {City}", vm.CityName);
         }
 
-        // EF Core: Load user favorite cities and recent searches
         vm.FavoriteCities = await _dbContext.FavoriteCities.OrderBy(f => f.CityName).ToListAsync(cancellationToken);
         vm.IsFavorite = vm.FavoriteCities.Any(f => f.CityName.Equals(vm.CityName, StringComparison.OrdinalIgnoreCase));
         vm.RecentSearches = await _dbContext.SearchHistories
@@ -309,7 +299,6 @@ public class WeatherService : IWeatherService
             .Take(8)
             .ToListAsync(cancellationToken);
 
-        // EF Core LINQ: Connect related projects (To-Do List, Notes, Emergency Contacts)
         vm.MatchingTodoItems = await _dbContext.WeatherTodoItems
             .Where(t => t.TargetCity == "" || t.TargetCity.ToLower() == vm.CityName.ToLower())
             .ToListAsync(cancellationToken);
@@ -329,30 +318,25 @@ public class WeatherService : IWeatherService
 
     private void CalculateComfortGrade(WeatherViewModel vm)
     {
-        // Algorithm evaluating temperature, humidity, wind, UV, and rain
+
         double score = 100.0;
 
-        // Ideal temperature is 21°C - 24°C
         double tempPenalty = Math.Abs(vm.CurrentTempC - 22.0) * 2.5;
         score -= Math.Min(35, tempPenalty);
 
-        // Ideal humidity is 45% - 55%
         double humidityPenalty = Math.Abs(vm.Humidity - 50.0) * 0.4;
         score -= Math.Min(20, humidityPenalty);
 
-        // High winds (> 25 km/h) penalty
         if (vm.WindSpeedKmh > 25)
         {
             score -= (vm.WindSpeedKmh - 25) * 0.8;
         }
 
-        // Rain penalty
         if (vm.PrecipitationMm > 0)
         {
             score -= Math.Min(25, 10 + (vm.PrecipitationMm * 3));
         }
 
-        // High UV penalty
         if (vm.UvIndex > 8)
         {
             score -= (vm.UvIndex - 8) * 4;
@@ -373,10 +357,9 @@ public class WeatherService : IWeatherService
 
     private void GenerateWeatherAdvice(WeatherViewModel vm)
     {
-        // Demonstrating conditional structures, loops, and methods (Stage 1 focus)
+
         var advices = new List<WeatherAdvice>();
 
-        // 1. Temperature Advice
         if (vm.CurrentTempC >= 32)
         {
             advices.Add(new WeatherAdvice
@@ -411,7 +394,6 @@ public class WeatherService : IWeatherService
             });
         }
 
-        // 2. Rain & Precipitation Advice
         if (vm.PrecipitationMm > 0 || vm.WeatherCode >= 51 && vm.WeatherCode <= 67)
         {
             advices.Add(new WeatherAdvice
@@ -424,7 +406,6 @@ public class WeatherService : IWeatherService
             });
         }
 
-        // 3. Wind Advice
         if (vm.WindSpeedKmh >= 40)
         {
             advices.Add(new WeatherAdvice
@@ -437,7 +418,6 @@ public class WeatherService : IWeatherService
             });
         }
 
-        // 4. UV Advice
         if (vm.UvIndex >= 7)
         {
             advices.Add(new WeatherAdvice
@@ -450,7 +430,6 @@ public class WeatherService : IWeatherService
             });
         }
 
-        // 5. General Comfort Tip
         advices.Add(new WeatherAdvice
         {
             Category = "Atmosphere",

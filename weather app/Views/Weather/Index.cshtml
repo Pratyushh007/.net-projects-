@@ -4,7 +4,7 @@
 }
 
 <div class="container mt-3">
-    <!-- Saved Favorite Cities Quick-Bar -->
+
     @if (Model.FavoriteCities.Any())
     {
         <div class="d-flex align-items-center gap-2 mb-3 overflow-x-auto pb-2" style="scrollbar-width: none;">
@@ -19,7 +19,6 @@
         </div>
     }
 
-    <!-- Main Hero Weather Panel -->
     <div class="glass-panel hero-weather-card @Model.ThemeClass mb-4">
         <div class="row align-items-center">
             <div class="col-lg-7">
@@ -41,19 +40,18 @@
                 </h1>
                 <p class="text-secondary fs-5 mb-4">@Model.Country &bull; Updated @DateTime.UtcNow.ToString("htt UTC")</p>
 
-                <!-- Big Temperature Display -->
                 <div class="d-flex align-items-baseline gap-3 mb-3">
                     <div class="hero-temp-large unit-celsius">@Model.CurrentTempC.ToString("F1")°C</div>
                     <div class="hero-temp-large unit-fahrenheit d-none">@Model.CurrentTempF.ToString("F1")°F</div>
-                    
+
                     <div>
                         <div class="fs-5 text-white fw-semibold">
-                            Feels like 
+                            Feels like
                             <span class="unit-celsius">@Model.FeelsLikeC.ToString("F1")°C</span>
                             <span class="unit-fahrenheit d-none">@Model.FeelsLikeF.ToString("F1")°F</span>
                         </div>
                         <div class="text-secondary small">
-                            High: <span class="unit-celsius">@Model.TodayMaxC.ToString("F1")°C</span><span class="unit-fahrenheit d-none">@((Model.TodayMaxC * 9 / 5 + 32).ToString("F1"))°F</span> &bull; 
+                            High: <span class="unit-celsius">@Model.TodayMaxC.ToString("F1")°C</span><span class="unit-fahrenheit d-none">@((Model.TodayMaxC * 9 / 5 + 32).ToString("F1"))°F</span> &bull;
                             Low: <span class="unit-celsius">@Model.TodayMinC.ToString("F1")°C</span><span class="unit-fahrenheit d-none">@((Model.TodayMinC * 9 / 5 + 32).ToString("F1"))°F</span>
                         </div>
                     </div>
@@ -64,9 +62,8 @@
                     <span class="badge bg-secondary-subtle text-secondary">WMO Code @Model.WeatherCode</span>
                 </div>
 
-                <!-- Action Controls -->
                 <div class="d-flex flex-wrap gap-2">
-                    <!-- Favorite Toggle -->
+
                     <form asp-controller="Weather" asp-action="ToggleFavorite" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="cityName" value="@Model.CityName" />
@@ -74,14 +71,13 @@
                         <input type="hidden" name="lat" value="@Model.Latitude" />
                         <input type="hidden" name="lon" value="@Model.Longitude" />
                         <input type="hidden" name="adminArea" value="@Model.AdminArea" />
-                        
+
                         <button type="submit" class="btn @(Model.IsFavorite ? "btn-danger" : "btn-modern-outline") rounded-pill px-3">
                             <i class="bi @(Model.IsFavorite ? "bi-heart-fill" : "bi-heart") me-1"></i>
                             @(Model.IsFavorite ? "Saved in Favorites" : "Save Location")
                         </button>
                     </form>
 
-                    <!-- Export Options (Files focus from Stage 2) -->
                     <div class="dropdown d-inline">
                         <button class="btn btn-modern-outline rounded-pill px-3 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-download me-1"></i> Export Data
@@ -105,19 +101,16 @@
                         </ul>
                     </div>
 
-                    <!-- Compare with another city -->
                     <a asp-controller="Weather" asp-action="Compare" asp-route-city1="@Model.CityName" class="btn btn-modern-outline rounded-pill px-3">
                         <i class="bi bi-arrow-left-right me-1"></i> Compare City
                     </a>
 
-                    <!-- Atmospheric Calculator prefilled -->
                     <a asp-controller="Tools" asp-action="Calculator" asp-route-temp="@Model.CurrentTempC" asp-route-humidity="@Model.Humidity" asp-route-wind="@Model.WindSpeedKmh" class="btn btn-modern-outline rounded-pill px-3">
                         <i class="bi bi-calculator me-1"></i> Calc Comfort
                     </a>
                 </div>
             </div>
 
-            <!-- Big Animated Icon & Comfort Widget -->
             <div class="col-lg-5 text-center mt-4 mt-lg-0">
                 <div class="weather-badge-icon mb-3">
                     @Model.ConditionIcon
@@ -136,9 +129,8 @@
         </div>
     </div>
 
-    <!-- Atmospheric Metrics 6-Grid -->
     <div class="row g-3 mb-4">
-        <!-- Humidity -->
+
         <div class="col-6 col-md-4 col-lg-2">
             <div class="metric-pill">
                 <div class="icon-box text-info">💧</div>
@@ -149,7 +141,6 @@
             </div>
         </div>
 
-        <!-- Wind Speed -->
         <div class="col-6 col-md-4 col-lg-2">
             <div class="metric-pill">
                 <div class="icon-box text-primary">💨</div>
@@ -160,7 +151,6 @@
             </div>
         </div>
 
-        <!-- Wind Direction -->
         <div class="col-6 col-md-4 col-lg-2">
             <div class="metric-pill">
                 <div class="icon-box text-warning">🧭</div>
@@ -171,7 +161,6 @@
             </div>
         </div>
 
-        <!-- Pressure -->
         <div class="col-6 col-md-4 col-lg-2">
             <div class="metric-pill">
                 <div class="icon-box text-emerald">⏲️</div>
@@ -182,7 +171,6 @@
             </div>
         </div>
 
-        <!-- UV Index -->
         <div class="col-6 col-md-4 col-lg-2">
             <div class="metric-pill">
                 <div class="icon-box text-danger">☀️</div>
@@ -193,7 +181,6 @@
             </div>
         </div>
 
-        <!-- Precipitation -->
         <div class="col-6 col-md-4 col-lg-2">
             <div class="metric-pill">
                 <div class="icon-box text-info">🌧️</div>
@@ -205,7 +192,6 @@
         </div>
     </div>
 
-    <!-- Solar & Sunlight Times -->
     @if (!string.IsNullOrEmpty(Model.Sunrise))
     {
         <div class="glass-panel p-3 mb-4 d-flex flex-wrap justify-content-around align-items-center">
@@ -237,7 +223,6 @@
         </div>
     }
 
-    <!-- Hourly Trend Chart (Next 24 Hours) -->
     <div class="glass-panel p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
@@ -251,7 +236,6 @@
             <canvas id="hourlyWeatherChart"></canvas>
         </div>
 
-        <!-- Horizontal scrollable timeline chips -->
         <div class="hourly-timeline mt-3">
             @foreach (var hour in Model.HourlyForecast)
             {
@@ -273,12 +257,11 @@
         </div>
     </div>
 
-    <!-- 7-Day Extended Forecast -->
     <div class="row g-4 mb-4">
         <div class="col-lg-7">
             <div class="glass-panel p-4 h-100">
                 <h3 class="h5 fw-bold mb-3 text-white"><i class="bi bi-calendar3 text-primary me-2"></i>7-Day Extended Forecast</h3>
-                
+
                 <div class="daily-list">
                     @foreach (var day in Model.DailyForecast)
                     {
@@ -299,7 +282,7 @@
                                 <span class="text-muted mx-1">/</span>
                                 <span class="text-secondary unit-celsius">@day.MinTempC.ToString("F0")°</span>
                                 <span class="text-secondary unit-fahrenheit d-none">@((day.MinTempC * 9 / 5 + 32).ToString("F0"))°</span>
-                                
+
                                 @if (day.RainSumMm > 0)
                                 {
                                     <small class="text-info ms-2"><i class="bi bi-umbrella"></i> @day.RainSumMm.ToString("F1")mm</small>
@@ -311,7 +294,6 @@
             </div>
         </div>
 
-        <!-- Health, Attire & Outdoor Lifestyle Advices (Stage 1 conditional logic) -->
         <div class="col-lg-5">
             <div class="glass-panel p-4 h-100">
                 <h3 class="h5 fw-bold mb-3 text-white"><i class="bi bi-lightbulb text-warning me-2"></i>Atmospheric Insights & Tips</h3>
@@ -333,12 +315,11 @@
         </div>
     </div>
 
-    <!-- Connected Curriculum Modules Section -->
     <div class="glass-panel p-4 mb-4">
         <h3 class="h5 fw-bold mb-3 text-white"><i class="bi bi-intersect text-info me-2"></i>Connected Ecosystem Features for @Model.CityName</h3>
-        
+
         <div class="row g-3">
-            <!-- Related Tasks (Project 4: To-Do List) -->
+
             <div class="col-md-4">
                 <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass-subtle);">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -364,7 +345,6 @@
                 </div>
             </div>
 
-            <!-- Related Notes (Project 9: Personal Notes) -->
             <div class="col-md-4">
                 <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass-subtle);">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -390,7 +370,6 @@
                 </div>
             </div>
 
-            <!-- Emergency Dispatch (Project 11: Contact Book API) -->
             <div class="col-md-4">
                 <div class="p-3 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-glass-subtle);">
                     <div class="d-flex justify-content-between align-items-center mb-2">
@@ -403,7 +382,7 @@
                             @foreach (var c in Model.LocalContacts.Take(2))
                             {
                                 <li class="py-1">
-                                    <span class="text-white fw-semibold">@c.Name</span>: 
+                                    <span class="text-white fw-semibold">@c.Name</span>:
                                     <a href="tel:@c.Phone" class="text-info text-decoration-none fw-bold">@c.Phone</a>
                                 </li>
                             }
@@ -425,7 +404,7 @@
             const labels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HourlyForecast.Select(h => h.TimeLabel)));
             const temps = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HourlyForecast.Select(h => h.TempC)));
             const rainProbs = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HourlyForecast.Select(h => h.RainProbability)));
-            
+
             renderHourlyChart('hourlyWeatherChart', labels, temps, rainProbs);
         });
     </script>

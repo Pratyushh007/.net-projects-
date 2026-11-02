@@ -20,7 +20,6 @@
         </a>
     </div>
 
-    <!-- Live Weather Bar for Task Compatibility -->
     @if (currentWeather != null)
     {
         <div class="glass-panel p-3 mb-4 d-flex flex-wrap justify-content-between align-items-center">
@@ -40,7 +39,7 @@
     }
 
     <div class="row g-4">
-        <!-- New Task Form -->
+
         <div class="col-lg-4">
             <div class="glass-panel p-4">
                 <h2 class="h5 fw-bold text-white mb-3">Add Weather-Conditioned Task</h2>
@@ -102,13 +101,11 @@
             </div>
         </div>
 
-        <!-- Task List with LINQ Filters -->
         <div class="col-lg-8">
             <div class="glass-panel p-4">
                 <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
                     <h2 class="h5 fw-bold text-white mb-0">Your Tasks (@Model.Count)</h2>
 
-                    <!-- Filter Tabs -->
                     <div class="btn-group btn-group-sm">
                         <a asp-controller="Planner" asp-action="Todo" asp-route-city="@currentCity" asp-route-filter="all" class="btn @(filter == "all" ? "btn-primary" : "btn-modern-outline")">All</a>
                         <a asp-controller="Planner" asp-action="Todo" asp-route-city="@currentCity" asp-route-filter="active" class="btn @(filter == "active" ? "btn-primary" : "btn-modern-outline")">Active</a>
@@ -128,7 +125,6 @@
                     <div class="d-flex flex-column gap-2">
                         @foreach (var item in Model)
                         {
-                            // Weather Evaluation Logic: Check if current condition suits the task!
                             bool tempOk = true;
                             if (currentWeather != null)
                             {
@@ -172,8 +168,7 @@
                                                     Temp: @(item.MinTemp?.ToString("F0") ?? "*")°C to @(item.MaxTemp?.ToString("F0") ?? "*")°C
                                                 </span>
                                             }
-                                            
-                                            <!-- Weather Compatibility Status Indicator -->
+
                                             @if (!item.IsCompleted && currentWeather != null)
                                             {
                                                 if (weatherSuitable)

@@ -32,7 +32,6 @@ public class WeatherCalculations : IWeatherCalculations
         double windKmh = Math.Max(0.0, model.WindSpeedKmh);
         double pressure = Math.Max(800.0, model.PressureHpa);
 
-        // 1. Heat Index Calculation (NOAA formula converted to Celsius)
         double tF = (t * 9.0 / 5.0) + 32.0;
         double hiF;
 
@@ -59,7 +58,6 @@ public class WeatherCalculations : IWeatherCalculations
         else
             model.HeatRiskLevel = "Safe / Low Risk - Comfortable thermal index";
 
-        // 2. Wind Chill (Environment Canada / NOAA formula)
         if (t <= 10.0 && windKmh >= 4.8)
         {
             double wc = 13.12 + (0.6215 * t) - (11.37 * Math.Pow(windKmh, 0.16)) + (0.3965 * t * Math.Pow(windKmh, 0.16));
@@ -80,20 +78,17 @@ public class WeatherCalculations : IWeatherCalculations
             model.FrostbiteRisk = "Not applicable (Wind chill activates when temp <= 10°C & wind >= 4.8 km/h)";
         }
 
-        // 3. Dew Point (Magnus-Tetens formula)
         const double a = 17.27;
         const double b = 237.7;
         double alpha = ((a * t) / (b + t)) + Math.Log(rh / 100.0);
         double dewPoint = (b * alpha) / (a - alpha);
         model.DewPointC = Math.Round(dewPoint, 1);
 
-        // 4. Air Density: rho = p / (R_dry * T_kelvin)
         double tKelvin = t + 273.15;
         double pressurePa = pressure * 100.0;
         double airDensity = pressurePa / (287.058 * tKelvin);
         model.AirDensityKgM3 = Math.Round(airDensity, 3);
 
-        // 5. Rain Harvesting: mm * m2 * 0.9 runoff efficiency = Liters
         double harvest = model.RainfallMm * model.RoofAreaSqMeters * 0.9;
         model.RainHarvestLiters = Math.Round(harvest, 1);
 
@@ -166,7 +161,7 @@ public class WeatherCalculations : IWeatherCalculations
 
     private static double ConvertTemperature(double val, string from, string to, out string formula)
     {
-        // Normalize to Celsius first
+
         double celsius = from switch
         {
             "Fahrenheit" => (val - 32.0) * 5.0 / 9.0,
@@ -189,7 +184,7 @@ public class WeatherCalculations : IWeatherCalculations
 
     private static double ConvertWindSpeed(double val, string from, string to, out string formula)
     {
-        // Normalize to m/s
+
         double ms = from switch
         {
             "km/h" => val / 3.6,
@@ -212,7 +207,7 @@ public class WeatherCalculations : IWeatherCalculations
 
     private static double ConvertPressure(double val, string from, string to, out string formula)
     {
-        // Normalize to hPa (hectopascals)
+
         double hpa = from switch
         {
             "inHg" => val * 33.86389,
@@ -274,7 +269,7 @@ public class WeatherCalculations : IWeatherCalculations
         }
         else
         {
-            // High-entropy token
+
             const string upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
             const string lower = "abcdefghjkmnpqrstuvwxyz";
             const string digits = "23456789";
@@ -308,13 +303,11 @@ public class WeatherCalculations : IWeatherCalculations
 
     public decimal EstimateDailyHvacCost(double outdoorTempC, double indoorTempC, decimal costPerKwh)
     {
-        // Heating or cooling degree difference
+
         double deltaT = Math.Abs(outdoorTempC - indoorTempC);
 
-        // Typical home heat loss/gain coefficient ~ 0.8 kWh per degree day per 100 m²
         double kwhNeeded = deltaT * 0.85;
 
-        // Efficiency heat pump COP ~ 3.2
         double electricalKwh = kwhNeeded / 3.2;
 
         decimal estimatedDailyCost = (decimal)electricalKwh * costPerKwh;

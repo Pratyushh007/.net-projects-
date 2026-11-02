@@ -12,7 +12,6 @@ public class WeatherViewModel
     public string Timezone { get; set; } = "UTC";
     public DateTime LocalTime { get; set; } = DateTime.UtcNow;
 
-    // Current conditions
     public double CurrentTempC { get; set; }
     public double CurrentTempF => Math.Round(CurrentTempC * 9 / 5 + 32, 1);
     public double FeelsLikeC { get; set; }
@@ -29,33 +28,27 @@ public class WeatherViewModel
     public string ThemeClass { get; set; } = "theme-clear-day";
     public bool IsDay { get; set; } = true;
 
-    // Daily & Solar
     public double TodayMaxC { get; set; }
     public double TodayMinC { get; set; }
     public double UvIndex { get; set; }
     public string Sunrise { get; set; } = string.Empty;
     public string Sunset { get; set; } = string.Empty;
 
-    // Comfort Grade & Score (Project 5: Grade Manager)
     public string ComfortGrade { get; set; } = "B+";
     public int ComfortScore { get; set; } = 85;
     public string ComfortSummary { get; set; } = "Pleasant conditions";
 
-    // Forecasts
     public List<HourlyForecastItem> HourlyForecast { get; set; } = new();
     public List<DailyForecastItem> DailyForecast { get; set; } = new();
 
-    // Favorites & History state
     public bool IsFavorite { get; set; }
     public List<FavoriteCity> FavoriteCities { get; set; } = new();
     public List<SearchHistory> RecentSearches { get; set; } = new();
 
-    // Integrated related features from the other projects:
     public List<WeatherTodoItem> MatchingTodoItems { get; set; } = new();
     public List<WeatherNote> RelatedNotes { get; set; } = new();
     public List<EmergencyContact> LocalContacts { get; set; } = new();
 
-    // Health and Lifestyle Advices generated via conditional methods
     public List<WeatherAdvice> Advices { get; set; } = new();
 }
 
@@ -84,9 +77,9 @@ public class DailyForecastItem
 
 public class WeatherAdvice
 {
-    public string Category { get; set; } = "General"; // Outdoor, Attire, Health, Travel
+    public string Category { get; set; } = "General";
     public string Icon { get; set; } = "💡";
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Severity { get; set; } = "info"; // info, success, warning, alert
+    public string Severity { get; set; } = "info";
 }

@@ -25,7 +25,6 @@
         </div>
     </div>
 
-    <!-- Filter and Search Bar -->
     <div class="glass-panel p-3 mb-4">
         <form method="get" asp-controller="Notes" asp-action="Index" class="row g-2 align-items-center">
             <div class="col-md-5">
@@ -57,7 +56,6 @@
         </form>
     </div>
 
-    <!-- Notes Grid -->
     @if (!Model.Any())
     {
         <div class="glass-panel p-5 text-center text-muted">

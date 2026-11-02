@@ -64,10 +64,9 @@ public class TaskManager
         _tasks = _storage.Load();
     }
 
-    // Collection management
     public void AddTask(string title, string description, Priority priority)
     {
-        // LINQ: Determine next ID safely
+
         int nextId = _tasks.Any() ? _tasks.Max(t => t.Id) + 1 : 1;
 
         _tasks.Add(new TodoItem
@@ -83,7 +82,7 @@ public class TaskManager
 
     public bool MarkComplete(int id)
     {
-        // LINQ: Find item by ID
+
         var item = _tasks.FirstOrDefault(t => t.Id == id);
         if (item == null) return false;
 
@@ -102,18 +101,15 @@ public class TaskManager
         return true;
     }
 
-    // LINQ: Filter active vs completed
     public IEnumerable<TodoItem> GetPendingTasks() =>
         _tasks.Where(t => !t.IsCompleted).OrderBy(t => t.Priority);
 
     public IEnumerable<TodoItem> GetCompletedTasks() =>
         _tasks.Where(t => t.IsCompleted).OrderByDescending(t => t.CreatedAt);
 
-    // LINQ: Search by title keyword
     public IEnumerable<TodoItem> Search(string keyword) =>
         _tasks.Where(t => t.Title.Contains(keyword, StringComparison.OrdinalIgnoreCase));
 
-    // LINQ: Aggregate statistics
     public (int Total, int Pending, int HighPriority) GetStats() =>
         (_tasks.Count,
          _tasks.Count(t => !t.IsCompleted),

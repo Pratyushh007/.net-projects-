@@ -1,12 +1,9 @@
-// Atmosphere 360 - Dynamic Client Script
-
 document.addEventListener('DOMContentLoaded', () => {
     initCityAutocomplete();
     initUnitToggle();
     initGeolocation();
 });
 
-// Autocomplete for city search
 function initCityAutocomplete() {
     const input = document.getElementById('citySearchInput');
     const dropdown = document.getElementById('citySearchDropdown');
@@ -37,7 +34,7 @@ function initCityAutocomplete() {
                 }
 
                 dropdown.innerHTML = items.map(item => `
-                    <div class="search-dropdown-item" 
+                    <div class="search-dropdown-item"
                          onclick="selectCity('${item.name.replace(/'/g, "\\'")}', '${(item.country || '').replace(/'/g, "\\'")}', ${item.latitude}, ${item.longitude})">
                         <div>
                             <strong class="text-white">${item.name}</strong>

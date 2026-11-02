@@ -15,7 +15,6 @@
         </a>
     </div>
 
-    <!-- City Pickers Form -->
     <div class="glass-panel p-3 mb-4">
         <form method="get" asp-controller="Weather" asp-action="Compare" class="row g-2 align-items-center">
             <div class="col-md-5">
@@ -41,7 +40,7 @@
     @if (w1 != null && w2 != null)
     {
         <div class="row g-4 mb-4">
-            <!-- City 1 Column -->
+
             <div class="col-md-6">
                 <div class="glass-panel p-4 h-100 @w1.ThemeClass">
                     <div class="d-flex justify-content-between align-items-start mb-3">
@@ -95,7 +94,6 @@
                 </div>
             </div>
 
-            <!-- City 2 Column -->
             <div class="col-md-6">
                 <div class="glass-panel p-4 h-100 @w2.ThemeClass">
                     <div class="d-flex justify-content-between align-items-start mb-3">

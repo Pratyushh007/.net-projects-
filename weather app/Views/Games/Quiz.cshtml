@@ -19,7 +19,7 @@
 
     <div class="row g-4 justify-content-center">
         <div class="col-lg-8">
-            <!-- Feedback Toast / Banner from previous question -->
+
             @if (TempData["FeedbackText"] != null)
             {
                 <div class="alert @(TempData["WasCorrect"] as bool? == true ? "alert-success border-success" : "alert-danger border-danger") bg-opacity-25 glass-panel text-white mb-4">
@@ -29,7 +29,7 @@
 
             @if (!Model.IsFinished && Model.CurrentQuestion != null)
             {
-                <!-- Progress Header -->
+
                 <div class="glass-panel p-4 mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <span class="badge bg-info-subtle text-info px-3 py-1 rounded-pill">
@@ -44,12 +44,10 @@
                         <div class="progress-bar bg-info" role="progressbar" style="width: @((Model.CurrentQuestionIndex) * 100 / Model.TotalQuestions)%;"></div>
                     </div>
 
-                    <!-- Question Prompt -->
                     <h2 class="h4 fw-bold text-white mb-4">
                         @Model.CurrentQuestion.QuestionText
                     </h2>
 
-                    <!-- Answer Options Form -->
                     <form asp-controller="Games" asp-action="SubmitQuizAnswer" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="qIndex" value="@Model.CurrentQuestionIndex" />
@@ -74,7 +72,7 @@
             }
             else
             {
-                <!-- Quiz Completion Card -->
+
                 <div class="glass-panel p-4 p-md-5 text-center mb-4">
                     <div class="display-1 mb-2">🏆</div>
                     <h2 class="display-6 fw-bold text-white mb-2">Quiz Completed!</h2>
@@ -83,7 +81,6 @@
                         (@Math.Round((double)Model.Score / Model.TotalQuestions * 100)% accuracy)
                     </p>
 
-                    <!-- Save Score to EF Core Form -->
                     <form asp-controller="Games" asp-action="SaveQuizScore" method="post" class="mx-auto mb-4" style="max-width: 400px;">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="finalScore" value="@Model.Score" />
@@ -101,7 +98,6 @@
                 </div>
             }
 
-            <!-- Global Leaderboard (EF Core LINQ) -->
             @if (Model.Leaderboard.Any())
             {
                 <div class="glass-panel p-4">

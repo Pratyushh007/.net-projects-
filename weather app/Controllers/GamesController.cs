@@ -12,7 +12,6 @@ public class GamesController : Controller
     private readonly WeatherDbContext _dbContext;
     private readonly IWeatherService _weatherService;
 
-    // Preset cities for the guessing game
     private static readonly (string City, string Country, double Lat, double Lon)[] GuessCities = new[]
     {
         ("Reykjavik", "Iceland", 64.1466, -21.9426),
@@ -91,13 +90,10 @@ public class GamesController : Controller
         _weatherService = weatherService;
     }
 
-    // ==========================================
-    // Project 1: Number Guessing Game (Weather Temperature Guesser)
-    // ==========================================
     [HttpGet]
     public async Task<IActionResult> GuessTemperature(int? cityIndex, int? guess, int attempts = 0, int streak = 0)
     {
-        // Pick a city index
+
         int idx = cityIndex ?? Random.Shared.Next(GuessCities.Length);
         if (idx < 0 || idx >= GuessCities.Length) idx = 0;
 
@@ -163,9 +159,6 @@ public class GamesController : Controller
         return View(vm);
     }
 
-    // ==========================================
-    // Project 6: Quiz App (Meteorology & Extreme Weather Quiz)
-    // ==========================================
     [HttpGet]
     public async Task<IActionResult> Quiz(int qIndex = 0, int currentScore = 0)
     {
@@ -177,7 +170,7 @@ public class GamesController : Controller
 
         if (qIndex >= QuestionBank.Count)
         {
-            // Quiz completed
+
             var completedVm = new QuizSessionViewModel
             {
                 CurrentQuestionIndex = qIndex,

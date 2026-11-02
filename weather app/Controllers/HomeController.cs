@@ -50,7 +50,6 @@ public class HomeController : Controller
             ClimateWalletBalance = await _dbContext.EnergyAccounts.Select(a => a.CurrentBalance).FirstOrDefaultAsync()
         };
 
-        // Fetch quick snapshots for 3 global featured cities
         string[] sampleCities = { "London", "Tokyo", "New York" };
         foreach (var c in sampleCities)
         {
@@ -70,7 +69,7 @@ public class HomeController : Controller
             }
             catch
             {
-                // Graceful fallback
+
             }
         }
 

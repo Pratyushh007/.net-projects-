@@ -8,7 +8,7 @@ public static class WmoWeatherCodeHelper
     {
         return code switch
         {
-            0 => isDay 
+            0 => isDay
                 ? new WeatherInfo("Clear Sky", "☀️", "theme-clear-day", "sunny")
                 : new WeatherInfo("Clear Night", "🌙", "theme-clear-night", "clear-night"),
             1 => isDay

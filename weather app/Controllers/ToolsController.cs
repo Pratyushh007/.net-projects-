@@ -18,9 +18,6 @@ public class ToolsController : Controller
         _dbContext = dbContext;
     }
 
-    // ==========================================
-    // Project 2: Simple Calculator
-    // ==========================================
     [HttpGet]
     public IActionResult Calculator(double? temp, double? humidity, double? wind)
     {
@@ -41,9 +38,6 @@ public class ToolsController : Controller
         return View(model);
     }
 
-    // ==========================================
-    // Project 3: Unit Converter
-    // ==========================================
     [HttpGet]
     public IActionResult Converter(string? category, double? value, string? from, string? to)
     {
@@ -67,9 +61,6 @@ public class ToolsController : Controller
         return View(model);
     }
 
-    // ==========================================
-    // Project 8: Password Generator
-    // ==========================================
     [HttpGet]
     public IActionResult Password()
     {
@@ -86,9 +77,6 @@ public class ToolsController : Controller
         return View(model);
     }
 
-    // ==========================================
-    // Project 7: Bank Account Simulator (Weather Energy Budget)
-    // ==========================================
     [HttpGet]
     public async Task<IActionResult> EnergyBudget(string? city = "London", double? outdoorTemp = 9.5)
     {

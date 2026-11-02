@@ -19,16 +19,12 @@ public class PlannerController : Controller
         _weatherService = weatherService;
     }
 
-    // ==========================================
-    // Project 4: Weather-Smart To-Do List
-    // ==========================================
     [HttpGet]
     public async Task<IActionResult> Todo(string? city = "London", string? filter = "all")
     {
         var targetCity = string.IsNullOrWhiteSpace(city) ? "London" : city.Trim();
         var weather = await _weatherService.GetWeatherForCityAsync(targetCity);
 
-        // LINQ: Retrieve tasks and filter according to status/priority
         var query = _dbContext.WeatherTodoItems.AsQueryable();
 
         if (filter == "active")
@@ -106,9 +102,6 @@ public class PlannerController : Controller
         return RedirectToAction(nameof(Todo), new { city });
     }
 
-    // ==========================================
-    // Project 5: Student Grade Manager (City Weather Report Cards)
-    // ==========================================
     [HttpGet]
     public async Task<IActionResult> Grades()
     {
